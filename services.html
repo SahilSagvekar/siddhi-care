@@ -21,7 +21,7 @@
       <span class="logo-text">SIDDHI<span class="logo-sub">ElderCare Services</span></span>
     </a>
 
-    <nav class="site-nav" aria-label="Primary">
+    <nav class="site-nav" id="siteNav" aria-label="Primary">
       <a href="index.html#top">Home</a>
       <a href="services.html" class="is-active">Services</a>
       <a href="plans.html">Plans &amp; Prices</a>
@@ -30,14 +30,18 @@
       <a href="contact.html">Contact</a>
     </nav>
 
-    <a class="btn btn-primary header-cta" href="#contact-services">Book A Free Consultation</a>
+    <button type="button" class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="siteNav">
+      <span class="nav-toggle-bar"></span>
+      <span class="nav-toggle-bar"></span>
+      <span class="nav-toggle-bar"></span>
+    </button>
   </div>
 </header>
 
 <main id="main">
 
   <!-- PAGE HERO -->
-  <section class="page-hero" id="top">
+  <section class="page-hero page-hero-photo" id="top">
     <div class="wrap page-hero-inner">
       <p class="hero-badge">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.2 5 5.6 5c1.9 0 3.3 1 4.1 2.3.4.6.9 1.4 1.3 2 .4.2.9.1 1.2-.2l1.1-1.4c.6-.8 1.2-1.9.9-3.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 21s7.5-4.6 10-9.2C22.5 6.9 20 4 16.4 4c-1.7 0-3.4.8-4.4 2.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -68,91 +72,152 @@
   </section>
 
   <!-- SERVICES LIST -->
-  <section class="services-full" id="all-services">
+  <section class="services" id="all-services">
     <div class="wrap services-head">
       <p class="section-badge">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.2 5 5.6 5c1.9 0 3.3 1 4.1 2.3.4.6.9 1.4 1.3 2 .4.2.9.1 1.2-.2l1.1-1.4c.6-.8 1.2-1.9.9-3.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 21s7.5-4.6 10-9.2C22.5 6.9 20 4 16.4 4c-1.7 0-3.4.8-4.4 2.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
         What We Offer
       </p>
-      <h2>Our Services</h2>
-      <p class="services-lede">Every family's situation is different — here's the full range of support our care coordinators provide.</p>
+      <h2>Personalized Care For<br><em>Every Family</em></h2>
+      <p class="services-lede">No two families are the same — every plan is shaped around your parents' needs, routine, and personality.</p>
     </div>
 
     <div class="wrap">
-      <div class="addons-grid">
+      <div class="services-grid">
 
-        <article class="addon-card">
-          <span class="addon-icon" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 21c-4.5-2.8-8-6.2-8-10.2C4 7.6 6.2 5 9 5c1.3 0 2.4.6 3 1.6.6-1 1.7-1.6 3-1.6 2.8 0 5 2.6 5 5.8 0 4-3.5 7.4-8 10.2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 8v5M9.5 10.5h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-          </span>
-          <h3>Medical &amp; Hospital Support</h3>
-          <p>Assistance with doctor visits, hospital coordination, appointments, and medical requirements.</p>
+        <article class="service-card">
+          <div class="service-banner">
+            <img src="1.jpg" alt="Caregiver assisting a senior in their home">
+          </div>
+          <div class="service-body">
+            <h3>Medical &amp; Hospital Support</h3>
+            <p>Assistance with doctor visits, hospital coordination, appointments, and medical requirements.</p>
+            <a class="service-link" href="#contact-services">Learn More <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
         </article>
 
-        <article class="addon-card">
-          <span class="addon-icon" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3v3M4.2 6.2l2.1 2.1M2 13h3M19 13h3M17.7 8.3l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M6 21h12l-1.2-6.5a4.8 4.8 0 0 0-9.6 0Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-          </span>
-          <h3>Emergency Support</h3>
-          <p>Quick assistance and coordination during medical or other emergencies.</p>
+        <article class="service-card">
+          <div class="service-banner">
+            <img src="13.jpg" alt="Emergency medical responder attending to a patient">
+          </div>
+          <div class="service-body">
+            <h3>Emergency Support</h3>
+            <p>Quick assistance and coordination during medical or other emergencies.</p>
+            <a class="service-link" href="#contact-services">Learn More <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
         </article>
 
-        <article class="addon-card">
-          <span class="addon-icon" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.4 0 .8-.3 1l-2.2 2.2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-          </span>
-          <h3>Well-Being Checking</h3>
-          <p>Twice-a-week well-being checks, with updates sent to family members through WhatsApp.</p>
+        <article class="service-card">
+          <div class="service-banner">
+            <img src="15.jpg" alt="Wife checking her husband's blood pressure at home">
+          </div>
+          <div class="service-body">
+            <h3>Well-Being Checking</h3>
+            <p>Twice-a-week well-being checks, with updates sent to family members through WhatsApp.</p>
+            <a class="service-link" href="#contact-services">Learn More <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
         </article>
 
-        <article class="addon-card">
-          <span class="addon-icon" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </span>
-          <h3>24/7 On-Call Support</h3>
-          <p>Round-the-clock support whenever assistance is needed — day or night.</p>
+        <article class="service-card">
+          <div class="service-banner">
+            <img src="17.jpeg" alt="Caregiver with an elderly woman at home">
+          </div>
+          <div class="service-body">
+            <h3>24/7 On-Call Support</h3>
+            <p>Round-the-clock support whenever assistance is needed — day or night.</p>
+            <a class="service-link" href="#contact-services">Learn More <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
         </article>
 
-        <article class="addon-card">
-          <span class="addon-icon" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 16V9a1 1 0 0 1 1-1h9l4 4h3a1 1 0 0 1 1 1v3" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="7.5" cy="17" r="2" stroke="currentColor" stroke-width="1.6"/><circle cx="17.5" cy="17" r="2" stroke="currentColor" stroke-width="1.6"/><path d="M9.5 17h6" stroke="currentColor" stroke-width="1.6"/></svg>
-          </span>
-          <h3>Logistics Support</h3>
-          <p>Help with transportation, delivery, coordination, and other essential arrangements.</p>
+        <article class="service-card">
+          <div class="service-banner">
+            <img src="8.jpg" alt="Caregiver pushing a senior in a wheelchair">
+          </div>
+          <div class="service-body">
+            <h3>Logistics Support</h3>
+            <p>Help with transportation, delivery, coordination, and other essential arrangements.</p>
+            <a class="service-link" href="#contact-services">Learn More <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
         </article>
 
-        <article class="addon-card">
-          <span class="addon-icon" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 3h7l4 4v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M14 3v4h4M9 13h6M9 16.5h6M9 9.5h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          </span>
-          <h3>Paperwork &amp; Billing Support</h3>
-          <p>Assistance with documentation, medical paperwork, bills, and related administrative tasks.</p>
+        <article class="service-card">
+          <div class="service-banner">
+            <img src="6.jpg" alt="Counting bills and reviewing paperwork">
+          </div>
+          <div class="service-body">
+            <h3>Paperwork &amp; Billing Support</h3>
+            <p>Assistance with documentation, medical paperwork, bills, and related administrative tasks.</p>
+            <a class="service-link" href="#contact-services">Learn More <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
         </article>
 
-        <article class="addon-card">
-          <span class="addon-icon" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M2.5 16.5 21 8.8c1-.4 1.9.6 1.4 1.5l-8 14.5-1.9-6.7-6.7-1.9 8-8" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>
-          </span>
-          <h3>Travelling Support</h3>
-          <p>Support and coordination for local or outstation travel, appointments, and essential journeys.</p>
+        <article class="service-card">
+          <div class="service-banner">
+            <img src="Caregiver_and_woman_blowing.jpeg" alt="Caregiver and senior enjoying a walk outdoors">
+          </div>
+          <div class="service-body">
+            <h3>Travelling Support</h3>
+            <p>Support and coordination for local or outstation travel, appointments, and essential journeys.</p>
+            <a class="service-link" href="#contact-services">Learn More <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
         </article>
 
       </div>
 
       <div class="services-cta">
-        <a class="btn btn-primary btn-large" href="#contact-services">Start With A Free Conversation
+        <button type="button" class="btn btn-primary btn-large js-open-consult">Start With A Free Conversation
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
+        </button>
       </div>
     </div>
   </section>
 
-  <!-- COORDINATORS / CONTACT -->
+  <!-- SERVICES SHOWCASE + COORDINATORS -->
   <section class="team" id="contact-services">
-    <div class="wrap">
-      <p class="eyebrow">Your Loved Ones Deserve The Best Care</p>
-      <h2>We're Here To Support, Coordinate,<br>And Assist — <em>Whenever You Need Us</em></h2>
-      <p class="team-lede">24/7 support available. Reliable care, quick assistance, and complete peace of mind — reach out to either of our care coordinators directly.</p>
+    <div class="wrap showcase-grid">
+      <div class="showcase-copy">
+        <p class="eyebrow">Your Loved Ones Deserve The Best Care</p>
+        <h2>We're Here To Support, Coordinate,<br>And Assist — <em>Whenever You Need Us</em></h2>
+
+        <ul class="showcase-checklist">
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.2 5 5.6 5c1.9 0 3.3 1 4.1 2.3.4.6.9 1.4 1.3 2 .4.2.9.1 1.2-.2l1.1-1.4c.6-.8 1.2-1.9.9-3.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 21s7.5-4.6 10-9.2C22.5 6.9 20 4 16.4 4c-1.7 0-3.4.8-4.4 2.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div><strong>Medical &amp; Hospital Support</strong><p>Assistance with doctor visits, hospital coordination, appointments, and medical requirements.</p></div>
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.2 5 5.6 5c1.9 0 3.3 1 4.1 2.3.4.6.9 1.4 1.3 2 .4.2.9.1 1.2-.2l1.1-1.4c.6-.8 1.2-1.9.9-3.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 21s7.5-4.6 10-9.2C22.5 6.9 20 4 16.4 4c-1.7 0-3.4.8-4.4 2.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div><strong>Emergency Support</strong><p>Quick assistance and coordination during medical or other emergencies.</p></div>
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.2 5 5.6 5c1.9 0 3.3 1 4.1 2.3.4.6.9 1.4 1.3 2 .4.2.9.1 1.2-.2l1.1-1.4c.6-.8 1.2-1.9.9-3.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 21s7.5-4.6 10-9.2C22.5 6.9 20 4 16.4 4c-1.7 0-3.4.8-4.4 2.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div><strong>Well-Being Checking</strong><p>Twice a week well-being checks and updates to family members through WhatsApp.</p></div>
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.2 5 5.6 5c1.9 0 3.3 1 4.1 2.3.4.6.9 1.4 1.3 2 .4.2.9.1 1.2-.2l1.1-1.4c.6-.8 1.2-1.9.9-3.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 21s7.5-4.6 10-9.2C22.5 6.9 20 4 16.4 4c-1.7 0-3.4.8-4.4 2.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div><strong>24/7 On-Call Support</strong><p>Round-the-clock support whenever assistance is needed.</p></div>
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.2 5 5.6 5c1.9 0 3.3 1 4.1 2.3.4.6.9 1.4 1.3 2 .4.2.9.1 1.2-.2l1.1-1.4c.6-.8 1.2-1.9.9-3.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 21s7.5-4.6 10-9.2C22.5 6.9 20 4 16.4 4c-1.7 0-3.4.8-4.4 2.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div><strong>Logistics Support</strong><p>Help with transportation, delivery, coordination, and other essential arrangements.</p></div>
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.2 5 5.6 5c1.9 0 3.3 1 4.1 2.3.4.6.9 1.4 1.3 2 .4.2.9.1 1.2-.2l1.1-1.4c.6-.8 1.2-1.9.9-3.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 21s7.5-4.6 10-9.2C22.5 6.9 20 4 16.4 4c-1.7 0-3.4.8-4.4 2.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div><strong>Paperwork &amp; Billing Support</strong><p>Assistance with documentation, medical paperwork, bills, and related administrative tasks.</p></div>
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.2 5 5.6 5c1.9 0 3.3 1 4.1 2.3.4.6.9 1.4 1.3 2 .4.2.9.1 1.2-.2l1.1-1.4c.6-.8 1.2-1.9.9-3.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 21s7.5-4.6 10-9.2C22.5 6.9 20 4 16.4 4c-1.7 0-3.4.8-4.4 2.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div><strong>Traveling Support</strong><p>Support and coordination for local or outstation travel, appointments, and essential journeys.</p></div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="showcase-photo">
+        <img src="hero-photo.jpeg" alt="Caregiver and senior smiling together outdoors">
+      </div>
+    </div>
+
+    <!-- <div class="wrap coordinators-block">
+      <p class="team-lede">24/7 Support Available. Reliable Care • Quick Assistance • Complete Peace of Mind — reach out to either of our care coordinators directly.</p>
 
       <div class="team-grid">
         <article class="team-card">
@@ -174,7 +239,7 @@
           </div>
         </article>
       </div>
-    </div>
+    </div> -->
   </section>
 
   <!-- CTA -->
@@ -259,6 +324,68 @@
     </div>
   </div>
 </footer>
+<!-- FREE CONSULTATION MODAL -->
+<div class="modal-overlay" id="consultModal" role="dialog" aria-modal="true" aria-labelledby="consultModalTitle">
+  <div class="modal-card">
+    <div class="modal-card-top"></div>
+    <button type="button" class="modal-close" aria-label="Close">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+
+    <div class="modal-body">
+      <form class="modal-form" action="https://formsubmit.co/ajax/sahilsagvekar230@gmail.com" method="POST">
+        <h2 id="consultModalTitle">Get Your Free Consultation</h2>
+        <p class="modal-lede">Tell us a little about your parents' care needs — a coordinator will call you back, usually within a few hours.</p>
+
+        <input type="hidden" name="_subject" value="New Free Consultation Request — SIDDHI ElderCare">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_captcha" value="false">
+
+        <div class="form-row">
+          <label for="consultName">Name*</label>
+          <input type="text" id="consultName" name="Name" placeholder="Please enter your name" required>
+        </div>
+
+        <div class="form-two-col">
+          <div class="form-row">
+            <label for="consultEmail">Your Email*</label>
+            <input type="email" id="consultEmail" name="Email" placeholder="To share details" required>
+          </div>
+          <div class="form-row">
+            <label for="consultPhone">Your Phone Number*</label>
+            <div class="phone-input-group">
+              <span class="phone-prefix">+91</span>
+              <input type="tel" id="consultPhone" name="Phone" placeholder="98765 43210" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label for="consultCity">Parent's City*</label>
+          <input type="text" id="consultCity" name="Parent's City" placeholder="Where is care required?" required>
+        </div>
+
+        <div class="consent-row">
+          <input type="checkbox" id="consultConsent" name="Consent" value="Yes" required>
+          <label for="consultConsent">By submitting this form, you agree to receive calls from SIDDHI ElderCare Services regarding our services.</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-large">Submit
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </form>
+
+      <div class="modal-success">
+        <svg width="46" height="46" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.5 10.5 15 16 9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h3>Thank You!</h3>
+        <p>A care coordinator will call you back shortly. You can also reach us directly at <a href="tel:+918369180832">8369 180 832</a>.</p>
+      </div>
+
+      <p class="modal-error">Something went wrong sending your details — please call us directly at <a href="tel:+918369180832">8369 180 832</a> instead.</p>
+    </div>
+  </div>
+</div>
+
 
 <script src="script.js"></script>
 </body>
