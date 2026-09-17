@@ -1,0 +1,17 @@
+{
+  "name": "siddhi-care",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SIDDHI ElderCare Services — static site with a git-backed admin content editor",
+  "scripts": {
+    "build": "node scripts/inject-content.js",
+    "hash-password": "node scripts/hash-password.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cheerio": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

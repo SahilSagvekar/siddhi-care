@@ -1,0 +1,118 @@
+{
+  "hero": {
+    "badge": "Our Services",
+    "headingPart1": "Compassionate Care.",
+    "headingPart2": "Reliable Support. ",
+    "headingEm": "Peace of Mind.",
+    "lede": "We provide trusted and dependable elderly care support to help seniors and their families manage everyday needs with comfort, safety, and confidence."
+  },
+  "trustBadges": {
+    "0": "Trusted & Reliable",
+    "1": "Experienced & Trained Team",
+    "2": "Quick Response",
+    "3": "Complete Peace Of Mind"
+  },
+  "servicesSection": {
+    "badge": "What We Offer",
+    "headingPart1": "Personalized Care For",
+    "headingEm": "Every Family",
+    "lede": "No two families are the same — every plan is shaped around your parents' needs, routine, and personality."
+  },
+  "services": {
+    "0": {
+      "title": "Medical & Hospital Support",
+      "description": "Assistance with doctor visits, hospital coordination, appointments, and medical requirements.",
+      "learnMore": "Learn More"
+    },
+    "1": {
+      "title": "Emergency Support",
+      "description": "Quick assistance and coordination during medical or other emergencies.",
+      "learnMore": "Learn More"
+    },
+    "2": {
+      "title": "Well-Being Checking",
+      "description": "Twice-a-week well-being checks, with updates sent to family members through WhatsApp.",
+      "learnMore": "Learn More"
+    },
+    "3": {
+      "title": "24/7 On-Call Support",
+      "description": "Round-the-clock support whenever assistance is needed — day or night.",
+      "learnMore": "Learn More"
+    },
+    "4": {
+      "title": "Logistics Support",
+      "description": "Help with transportation, delivery, coordination, and other essential arrangements.",
+      "learnMore": "Learn More"
+    },
+    "5": {
+      "title": "Paperwork & Billing Support",
+      "description": "Assistance with documentation, medical paperwork, bills, and related administrative tasks.",
+      "learnMore": "Learn More"
+    },
+    "6": {
+      "title": "Travelling Support",
+      "description": "Support and coordination for local or outstation travel, appointments, and essential journeys.",
+      "learnMore": "Learn More"
+    }
+  },
+  "servicesCta": {
+    "buttonLabel": "Start With A Free Conversation"
+  },
+  "showcase": {
+    "eyebrow": "Your Loved Ones Deserve The Best Care",
+    "headingPart1": "We're Here To Support, Coordinate,",
+    "headingPart2": "And Assist — ",
+    "headingEm": "Whenever You Need Us",
+    "checklist": {
+      "0": {
+        "title": "Medical & Hospital Support",
+        "description": "Assistance with doctor visits, hospital coordination, appointments, and medical requirements."
+      },
+      "1": {
+        "title": "Emergency Support",
+        "description": "Quick assistance and coordination during medical or other emergencies."
+      },
+      "2": {
+        "title": "Well-Being Checking",
+        "description": "Twice a week well-being checks and updates to family members through WhatsApp."
+      },
+      "3": {
+        "title": "24/7 On-Call Support",
+        "description": "Round-the-clock support whenever assistance is needed."
+      },
+      "4": {
+        "title": "Logistics Support",
+        "description": "Help with transportation, delivery, coordination, and other essential arrangements."
+      },
+      "5": {
+        "title": "Paperwork & Billing Support",
+        "description": "Assistance with documentation, medical paperwork, bills, and related administrative tasks."
+      },
+      "6": {
+        "title": "Traveling Support",
+        "description": "Support and coordination for local or outstation travel, appointments, and essential journeys."
+      }
+    }
+  },
+  "coordinators": {
+    "lede": "24/7 Support Available. Reliable Care • Quick Assistance • Complete Peace of Mind — reach out to either of our care coordinators directly.",
+    "0": {
+      "name": "Diksha",
+      "role": "Care Coordinator"
+    },
+    "1": {
+      "name": "Suraj",
+      "role": "Care Coordinator"
+    }
+  },
+  "cta": {
+    "badge": "24/7 Support Available",
+    "headingPart1": "Ready To Get ",
+    "headingEm": "Started?",
+    "lede": "Schedule a free, no-pressure consultation with our care team. We'll listen, answer every question, and help you find the right support — at no cost to you.",
+    "buttonLabel": "Start With A Free Conversation"
+  },
+  "footer": {
+    "tagline": "Compassionate, one-on-one non-medical home care for seniors and adults across Mumbai and Pune."
+  }
+}
