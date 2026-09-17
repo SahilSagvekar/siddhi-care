@@ -135,17 +135,23 @@ img{ max-width: 100%; display: block; }
   border-bottom: 1px solid var(--line-on-dark);
 }
 .header-inner{
+  position: relative;
   display:flex; align-items:center; justify-content: flex-start;
   padding-top: 20px; padding-bottom: 20px;
   gap: 52px;
 }
 .logo{ display:flex; align-items:center; gap:10px; text-decoration:none; color: var(--cream); }
 .logo-mark{ display:block; height: 50px; width: auto; }
-.logo-text{ font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; line-height:1; display:flex; flex-direction:column; color: var(--cream); }
-.logo-sub{ font-family: var(--font-body); font-weight: 500; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(251,247,239,0.7); margin-top: 3px; }
+.logo-text{ font-family: var(--font-display); font-weight: 700; font-size: 1.3rem; line-height:1; display:flex; flex-direction:column; color: var(--cream); }
+.logo-sub{ font-family: var(--font-body); font-weight: 500; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(251,247,239,0.7); margin-top: 4px; }
 
-.site-nav{ display:flex; gap: 30px; }
-.site-nav a{ text-decoration:none; font-weight: 600; font-size: 0.93rem; color: rgba(251,247,239,0.92); }
+.site-nav{
+  display:flex; gap: 30px;
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: max-content;
+}
+.site-nav a{ text-decoration:none; font-weight: 600; font-size: 0.93rem; color: rgba(251,247,239,0.92); white-space: nowrap; }
 .site-nav a:hover{ color: var(--marigold); }
 
 .header-cta{ flex-shrink: 0; }
@@ -182,6 +188,8 @@ img{ max-width: 100%; display: block; }
   .site-nav{
     position: absolute;
     top: 100%; left: 0; right: 0;
+    width: 100%;
+    transform: none;
     flex-direction: column;
     gap: 0;
     background: var(--pine-dark);
@@ -208,7 +216,7 @@ img{ max-width: 100%; display: block; }
    ============================================ */
 .hero{
   position: relative;
-  min-height: 92vh;
+  min-height: 100vh;
   display:flex;
   align-items:center;
   padding: 140px 0 90px;
@@ -723,7 +731,7 @@ img{ max-width: 100%; display: block; }
 /* ============================================
    Team
    ============================================ */
-.team{ padding: 88px 0; }
+.team{ padding: 88px 0; background: #fff; }
 .team-lede{ max-width: 46ch; margin-bottom: 40px; }
 .team-grid{ display:grid; grid-template-columns: repeat(2, minmax(220px, 320px)); gap: 20px; }
 .team-card{
@@ -891,6 +899,11 @@ img{ max-width: 100%; display: block; }
   background:
     linear-gradient(100deg, rgba(20,73,95,0.88) 0%, rgba(20,73,95,0.62) 45%, rgba(20,73,95,0.32) 70%, rgba(20,73,95,0.14) 100%),
     url('caregiver-services-hero.jpeg') center 30%/cover no-repeat;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding-top: 110px;
+  padding-bottom: 60px;
 }
 
 .site-nav a.is-active{ color: var(--marigold); }
