@@ -1,0 +1,31 @@
+{
+  "hero": {
+    "badge": "Trusted Care Coordinators · 24/7 On-Call Support",
+    "headingPart1": "Compassionate Elder Care",
+    "headingEm": "Family Deserves",
+    "lede": "One-on-one support for seniors and their families — medical coordination, emergency assistance, and regular well-being checks, so you always know they're okay.",
+    "buttonLabel": "Start With A Free Conversation"
+  },
+  "mission": {
+    "eyebrow": "Our Mission",
+    "text": "Our mission is to provide safe, compassionate, and personalized care for senior citizens, treating every elder not just as a client, but as a cherished member of our own family. We are dedicated to enriching their golden years with dignity, love, warmth, and the highest standard of care—ensuring they always feel at home, respected, and deeply cared for."
+  },
+  "trustStrip": {
+    "0": {
+      "bold": "24/7",
+      "text": " on-call support"
+    },
+    "1": {
+      "bold": "2×",
+      "text": " weekly well-being checks"
+    },
+    "2": {
+      "bold": "Family",
+      "text": " WhatsApp updates"
+    },
+    "3": {
+      "bold": "Verified",
+      "text": " care coordinators"
+    }
+  }
+}

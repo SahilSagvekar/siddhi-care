@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — SIDDHI ElderCare Services</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="../logo-mark.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pine-dark:#14495F; --pine:#2E7D6B; --sand:#F3EBDD; --cream:#FBF7EF;
+    --ink:#241F18; --ink-soft:#5B5347; --line:#E4DBC9; --marigold:#E7C64C;
+    --clayrose:#B85C56; --radius:14px; --radius-lg:20px;
+  }
+  *,*::before,*::after{ box-sizing:border-box; }
+  body{ margin:0; font-family:'Inter',sans-serif; background:var(--cream); color:var(--ink); line-height:1.5; }
+  .wrap{ max-width:760px; margin:0 auto; padding:48px 24px 80px; }
+  h1{ font-size:1.4rem; margin:0 0 4px; }
+  .sub{ color:var(--ink-soft); font-size:0.9rem; margin:0 0 32px; }
+
+  /* Login */
+  .login-card{ max-width:380px; margin:80px auto; background:#fff; border:1px solid var(--line); border-radius:var(--radius-lg); padding:32px 28px; }
+  .login-card h1{ font-size:1.2rem; }
+  .field{ margin-bottom:16px; display:flex; flex-direction:column; gap:6px; }
+  .field label{ font-size:0.82rem; font-weight:600; }
+  .field input, .field textarea{
+    font-family:inherit; font-size:0.92rem; padding:10px 12px;
+    border:1.5px solid var(--line); border-radius:8px; background:var(--cream); color:var(--ink);
+  }
+  .field input:focus, .field textarea:focus{ outline:none; border-color:var(--pine); }
+  .field textarea{ resize:vertical; min-height:70px; }
+  button{ font-family:inherit; cursor:pointer; }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    background:var(--pine-dark); color:#fff; border:none; border-radius:999px;
+    padding:11px 22px; font-size:0.9rem; font-weight:700; width:100%;
+  }
+  .btn:hover{ background:var(--pine); }
+  .btn:disabled{ opacity:0.6; cursor:not-allowed; }
+  .btn-secondary{ background:transparent; color:var(--ink-soft); border:1.5px solid var(--line); width:auto; padding:8px 16px; }
+  .error{ color:var(--clayrose); font-size:0.85rem; margin-top:10px; display:none; }
+  .error.is-visible{ display:block; }
+  .success{ color:var(--pine); font-size:0.85rem; margin-top:10px; display:none; }
+  .success.is-visible{ display:block; }
+
+  /* Editor */
+  .topbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
+  .page-picker{ display:flex; gap:8px; flex-wrap:wrap; }
+  .page-picker button{
+    background:#fff; border:1px solid var(--line); border-radius:999px;
+    padding:8px 16px; font-size:0.85rem; font-weight:600; color:var(--ink-soft);
+  }
+  .page-picker button.is-active{ background:var(--pine-dark); color:#fff; border-color:var(--pine-dark); }
+  .group{ background:#fff; border:1px solid var(--line); border-radius:var(--radius-lg); padding:22px 22px 6px; margin-bottom:18px; }
+  .group > .group-title{ font-weight:700; font-size:0.95rem; margin:0 0 14px; color:var(--pine-dark); text-transform:capitalize; }
+  .group .group{ background:var(--cream); }
+  .item-index{ font-size:0.72rem; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 8px; }
+  .save-bar{ position:sticky; bottom:0; background:var(--cream); padding:16px 0; border-top:1px solid var(--line); margin-top:8px; display:flex; align-items:center; gap:16px; }
+  .save-bar .btn{ width:auto; }
+  .hint{ font-size:0.78rem; color:var(--ink-soft); }
+  #loading{ color:var(--ink-soft); font-size:0.9rem; }
+</style>
+</head>
+<body>
+
+<div class="wrap" id="app">
+  <p id="loading">Loading…</p>
+</div>
+
+<script>
+(function () {
+  const app = document.getElementById('app');
+  const PAGES = ['index', 'services', 'plans', 'team', 'contact'];
+  let currentPage = null;
+  let currentData = null;
+
+  // ---------- API helpers ----------
+  async function api(path, options) {
+    const res = await fetch(path, {
+      ...options,
+      headers: { 'Content-Type': 'application/json', ...(options && options.headers) },
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(body.error || `Request failed (${res.status})`);
+    return body;
+  }
+
+  // ---------- Screens ----------
+  async function boot() {
+    try {
+      const me = await api('/api/me');
+      if (me.signedIn) {
+        renderEditorShell(me.email);
+      } else {
+        renderLogin();
+      }
+    } catch {
+      renderLogin();
+    }
+  }
+
+  function renderLogin() {
+    app.innerHTML = `
+      <div class="login-card">
+        <h1>Admin sign in</h1>
+        <p class="sub">SIDDHI ElderCare Services</p>
+        <form id="loginForm">
+          <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" required autocomplete="username">
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input type="password" id="password" required autocomplete="current-password">
+          </div>
+          <button type="submit" class="btn" id="loginBtn">Sign in</button>
+          <p class="error" id="loginError"></p>
+        </form>
+      </div>
+    `;
+    const form = document.getElementById('loginForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errEl = document.getElementById('loginError');
+      const btn = document.getElementById('loginBtn');
+      errEl.classList.remove('is-visible');
+      btn.disabled = true;
+      btn.textContent = 'Signing in…';
+      try {
+        await api('/api/login', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value,
+          }),
+        });
+        const me = await api('/api/me');
+        renderEditorShell(me.email);
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.classList.add('is-visible');
+        btn.disabled = false;
+        btn.textContent = 'Sign in';
+      }
+    });
+  }
+
+  function renderEditorShell(email) {
+    app.innerHTML = `
+      <div class="topbar">
+        <div>
+          <h1>Edit site content</h1>
+          <p class="sub">Signed in as ${escapeHtml(email)}</p>
+        </div>
+        <button class="btn btn-secondary" id="logoutBtn">Sign out</button>
+      </div>
+      <div class="page-picker" id="pagePicker"></div>
+      <div id="editorArea"><p id="loading">Choose a page above to start editing.</p></div>
+    `;
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await api('/api/logout', { method: 'POST' });
+      renderLogin();
+    });
+    const picker = document.getElementById('pagePicker');
+    PAGES.forEach((page) => {
+      const btn = document.createElement('button');
+      btn.textContent = page.charAt(0).toUpperCase() + page.slice(1);
+      btn.addEventListener('click', () => loadPage(page, btn));
+      picker.appendChild(btn);
+    });
+  }
+
+  async function loadPage(page, btnEl) {
+    document.querySelectorAll('.page-picker button').forEach((b) => b.classList.remove('is-active'));
+    if (btnEl) btnEl.classList.add('is-active');
+    const area = document.getElementById('editorArea');
+    area.innerHTML = '<p id="loading">Loading content…</p>';
+    try {
+      const res = await api(`/api/content?page=${encodeURIComponent(page)}`);
+      currentPage = page;
+      currentData = res.data;
+      renderForm(area, currentData);
+    } catch (err) {
+      area.innerHTML = `<p class="error is-visible">${escapeHtml(err.message)}</p>`;
+    }
+  }
+
+  // ---------- Generic recursive form renderer ----------
+  // Walks any JSON object/array-of-objects/string shape and renders matching
+  // inputs. Extending a page's content later (adding a key to its JSON +
+  // a data-k attribute in the HTML) needs no changes here — the form just
+  // grows to match whatever the JSON contains.
+  function renderForm(container, data) {
+    container.innerHTML = '';
+    const form = document.createElement('form');
+    form.appendChild(renderNode(data, ''));
+
+    const saveBar = document.createElement('div');
+    saveBar.className = 'save-bar';
+    saveBar.innerHTML = `
+      <button type="submit" class="btn" id="saveBtn">Save changes</button>
+      <span class="hint">Saved changes go live automatically within about a minute.</span>
+    `;
+    form.appendChild(saveBar);
+
+    const successEl = document.createElement('p');
+    successEl.className = 'success';
+    successEl.id = 'saveSuccess';
+    const errorEl = document.createElement('p');
+    errorEl.className = 'error';
+    errorEl.id = 'saveError';
+    form.appendChild(successEl);
+    form.appendChild(errorEl);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      successEl.classList.remove('is-visible');
+      errorEl.classList.remove('is-visible');
+      const saveBtn = document.getElementById('saveBtn');
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving…';
+      try {
+        const updated = collectValues(form, currentData);
+        const res = await api('/api/content', {
+          method: 'POST',
+          body: JSON.stringify({ page: currentPage, data: updated }),
+        });
+        currentData = updated;
+        successEl.textContent = res.message || 'Saved.';
+        successEl.classList.add('is-visible');
+      } catch (err) {
+        errorEl.textContent = err.message;
+        errorEl.classList.add('is-visible');
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save changes';
+      }
+    });
+
+    container.appendChild(form);
+  }
+
+  function renderNode(value, path) {
+    if (Array.isArray(value)) {
+      const wrap = document.createElement('div');
+      value.forEach((item, i) => {
+        const itemPath = path ? `${path}.${i}` : String(i);
+        const box = document.createElement('div');
+        box.className = 'group';
+        const label = document.createElement('p');
+        label.className = 'item-index';
+        label.textContent = `Item ${i + 1}`;
+        box.appendChild(label);
+        box.appendChild(renderNode(item, itemPath));
+        wrap.appendChild(box);
+      });
+      return wrap;
+    }
+
+    if (value !== null && typeof value === 'object') {
+      const wrap = document.createElement('div');
+      Object.keys(value).forEach((key) => {
+        const childPath = path ? `${path}.${key}` : key;
+        const child = value[key];
+        if (typeof child === 'string') {
+          wrap.appendChild(renderField(childPath, key, child));
+        } else {
+          const box = document.createElement('div');
+          box.className = 'group';
+          const title = document.createElement('p');
+          title.className = 'group-title';
+          title.textContent = humanize(key);
+          box.appendChild(title);
+          box.appendChild(renderNode(child, childPath));
+          wrap.appendChild(box);
+        }
+      });
+      return wrap;
+    }
+
+    // Fallback for an unexpected primitive at the root.
+    return renderField(path, path, String(value));
+  }
+
+  function renderField(dataPath, label, value) {
+    const field = document.createElement('div');
+    field.className = 'field';
+    const labelEl = document.createElement('label');
+    labelEl.textContent = humanize(label);
+    labelEl.setAttribute('for', `f_${dataPath}`);
+    field.appendChild(labelEl);
+
+    const long = value.length > 70;
+    const input = document.createElement(long ? 'textarea' : 'input');
+    if (!long) input.type = 'text';
+    input.id = `f_${dataPath}`;
+    input.dataset.path = dataPath;
+    input.value = value;
+    field.appendChild(input);
+    return field;
+  }
+
+  function collectValues(form, original) {
+    const clone = JSON.parse(JSON.stringify(original));
+    form.querySelectorAll('[data-path]').forEach((el) => {
+      setByPath(clone, el.dataset.path, el.value);
+    });
+    return clone;
+  }
+
+  function setByPath(obj, keyPath, value) {
+    const parts = keyPath.split('.');
+    let node = obj;
+    for (let i = 0; i < parts.length - 1; i++) {
+      node = node[/^\d+$/.test(parts[i]) ? Number(parts[i]) : parts[i]];
+    }
+    const lastKey = parts[parts.length - 1];
+    node[/^\d+$/.test(lastKey) ? Number(lastKey) : lastKey] = value;
+  }
+
+  function humanize(key) {
+    return String(key)
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/[_-]/g, ' ')
+      .replace(/^./, (c) => c.toUpperCase());
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>
