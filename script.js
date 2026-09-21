@@ -45,7 +45,7 @@ window.addEventListener('scroll', toggleHeader, { passive: true });
 const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 if (!prefersReduced && 'IntersectionObserver' in window) {
-  const targets = document.querySelectorAll('.service-card, .team-card, .process-steps li');
+  const targets = document.querySelectorAll('.service-card, .team-card, .process-card, .process-steps li');
   targets.forEach(el => {
     el.style.opacity = '0';
     el.style.transform = 'translateY(14px)';
