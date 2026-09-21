@@ -892,7 +892,7 @@ img{ max-width: 100%; display: block; }
 /* ============================================
    CTA / Contact
    ============================================ */
-.cta{ padding: 0 0 88px; }
+.cta{ padding: 80px 0; }
 
 .cta-media{
   position: relative;
@@ -1020,7 +1020,7 @@ img{ max-width: 100%; display: block; }
 @media (max-width: 600px){
   .hero{ padding: 120px 0 60px; min-height: unset; }
   .services, .process, .team{ padding: 60px 0; }
-  .cta{ padding: 0 0 60px; }
+  .cta{ padding: 50px 0; }
 }
 /* ============================================
    Plans & Prices page
