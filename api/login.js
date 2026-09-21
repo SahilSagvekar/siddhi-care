@@ -21,6 +21,7 @@ function tooManyAttempts(key) {
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
+    console.log(`Method not allowed: ${req.method}`); 
     res.status(405).json({ error: 'Method not allowed' });
     return;
   }
@@ -41,8 +42,8 @@ module.exports = async (req, res) => {
   }
   const { email, password } = body || {};
 
-  const adminEmail = process.env.ADMIN_EMAIL;
-  const adminHash = process.env.ADMIN_PASSWORD_HASH;
+  const adminEmail = 'sahilsagvekar230@gmail.com';
+  const adminHash = '$2a$10$QEnnoHWy.KWRnqUhsWPV1OILmaosKJyp7m0A4V21rPnn13OWi.IGu'; // Replace with the actual hashed password
 
   if (!adminEmail || !adminHash) {
     res.status(500).json({ error: 'Admin login is not configured on the server.' });
