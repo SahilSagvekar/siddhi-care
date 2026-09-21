@@ -48,9 +48,9 @@ h1,h2,h3{
   line-height: 1.12;
   font-weight: 600;
 }
-h1{ font-size: clamp(2.4rem, 4.4vw, 3.4rem); letter-spacing: -0.01em; }
+h1{ font-size: clamp(1.85rem, 5vw, 3.4rem); letter-spacing: -0.01em; }
 h1 em{ font-style: italic; color: var(--marigold-dark); }
-h2{ font-size: clamp(1.7rem, 2.6vw, 2.3rem); max-width: 20ch; }
+h2{ font-size: clamp(1.45rem, 3.2vw, 2.3rem); max-width: 20ch; }
 h3{ font-size: 1.15rem; }
 p{ margin: 0 0 1em; color: var(--ink-soft); }
 
@@ -61,6 +61,9 @@ img{ max-width: 100%; display: block; }
   max-width: var(--wrap);
   margin: 0 auto;
   padding: 0 24px;
+}
+@media (max-width: 480px){
+  .wrap{ padding: 0 16px; }
 }
 
 .skip-link{
@@ -182,7 +185,13 @@ img{ max-width: 100%; display: block; }
 .nav-toggle.is-active .nav-toggle-bar:nth-child(2){ opacity: 0; }
 .nav-toggle.is-active .nav-toggle-bar:nth-child(3){ transform: translateY(-7px) rotate(-45deg); }
 
-@media (max-width: 900px){
+@media (min-width: 961px) and (max-width: 1120px){
+  .header-inner{ gap: 24px; }
+  .site-nav{ gap: 18px; }
+  .site-nav a{ font-size: 0.88rem; }
+}
+
+@media (max-width: 960px){
   .header-inner{ gap: 16px; }
   .nav-toggle{ display: flex; }
   .site-nav{
@@ -209,6 +218,13 @@ img{ max-width: 100%; display: block; }
     border-bottom: 1px solid var(--line-on-dark);
     color: var(--cream);
   }
+}
+
+@media (max-width: 480px){
+  .header-inner{ padding-top: 14px; padding-bottom: 14px; }
+  .logo-mark{ height: 40px; }
+  .logo-text{ font-size: 1.15rem; }
+  .logo-sub{ font-size: 0.62rem; }
 }
 
 /* ============================================
@@ -264,6 +280,11 @@ img{ max-width: 100%; display: block; }
 @media (max-width: 600px){
   .hero{ min-height: unset; padding: 120px 0 70px; }
 }
+@media (max-width: 480px){
+  .hero-actions{ flex-direction: column; align-items: stretch; gap: 14px; }
+  .hero-actions .btn{ justify-content: center; width: 100%; }
+  .hero-phone-link{ justify-content: center; }
+}
 
 /* ============================================
    Trust strip
@@ -274,6 +295,10 @@ img{ max-width: 100%; display: block; }
 }
 .trust-strip-inner p{ margin:0; font-size: 0.9rem; color: rgba(251,247,239,0.85); }
 .trust-strip-inner strong{ color: var(--marigold); font-family: var(--font-display); margin-right: 6px; }
+
+@media (max-width: 680px){
+  .trust-strip-inner{ justify-content: center; text-align: center; gap: 12px 20px; }
+}
 
 /* ============================================
    Services
@@ -345,10 +370,10 @@ img{ max-width: 100%; display: block; }
 
 .services-cta{ text-align: center; margin-top: 48px; }
 
-@media (max-width: 900px){
-  .services-grid{ grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 960px){
+  .services-grid{ grid-template-columns: repeat(2, 1fr); gap: 20px; }
 }
-@media (max-width: 600px){
+@media (max-width: 640px){
   .services-grid{ grid-template-columns: 1fr; }
 }
 
@@ -478,11 +503,12 @@ img{ max-width: 100%; display: block; }
 }
 .cert-bbb-text{ font-size: 0.66rem; letter-spacing: 0.03em; }
 
-@media (max-width: 760px){
-  .trust-banner-media{ min-height: unset; padding: 26px 22px; gap: 24px; }
-  .trust-banner-heading{ align-self: flex-start; text-align: left; }
-  .trust-banner-checks{ gap: 8px 18px; }
-  .cert-row{ gap: 20px; }
+@media (max-width: 860px){
+  .trust-banner-media{ min-height: unset; padding: 32px 24px; gap: 24px; }
+  .trust-banner-heading{ position: static; text-align: left; margin: 8px 0 16px; }
+  .trust-banner-play{ position: static; transform: none; margin: 16px auto; }
+  .trust-banner-checks{ gap: 10px 18px; }
+  .cert-row{ gap: 18px; }
 }
 
 /* ============================================
@@ -668,7 +694,10 @@ img{ max-width: 100%; display: block; }
 
 .testimonials-cta{ text-align: center; margin-top: 48px; }
 
-@media (max-width: 900px){
+@media (max-width: 960px){
+  .testimonials-grid{ grid-template-columns: repeat(2, 1fr); gap: 20px; }
+}
+@media (max-width: 640px){
   .testimonials-grid{ grid-template-columns: 1fr; }
 }
 
@@ -750,6 +779,10 @@ img{ max-width: 100%; display: block; }
   background: var(--clayrose);
   flex-shrink: 0;
 }
+@media (max-width: 480px){
+  .areas-list{ gap: 8px; }
+  .areas-list li{ padding: 7px 14px; font-size: 0.82rem; }
+}
 
 .areas-note{ font-size: 0.88rem; margin: 0; }
 .areas-note a{
@@ -814,14 +847,17 @@ img{ max-width: 100%; display: block; }
 
 .resources-cta{ text-align: center; margin-top: 48px; }
 
-@media (max-width: 900px){
+@media (max-width: 960px){
+  .resources-grid{ grid-template-columns: repeat(2, 1fr); gap: 20px; }
+}
+@media (max-width: 640px){
   .resources-grid{ grid-template-columns: 1fr; }
 }
 
 /* ============================================
    Team
    ============================================ */
-.team{ padding: 88px 0; background: #fff; }
+.team{ padding: 88px 0; }
 .team-lede{ max-width: 58ch; margin: 0 auto 40px; text-align: center; }
 .team-grid{
   display: grid;
@@ -908,6 +944,12 @@ img{ max-width: 100%; display: block; }
   .cta-media{ min-height: unset; padding: 32px 24px; }
   .cta-heading{ max-width: none; }
 }
+@media (max-width: 500px){
+  .cta-media{ padding: 28px 18px; }
+  .cta-actions{ flex-direction: column; align-items: stretch; gap: 14px; }
+  .cta-actions .btn{ justify-content: center; width: 100%; }
+  .cta-phone-link{ justify-content: center; }
+}
 
 /* ============================================
    Footer
@@ -976,7 +1018,7 @@ img{ max-width: 100%; display: block; }
 }
 
 @media (max-width: 600px){
-  .hero{ padding: 52px 0 44px; }
+  .hero{ padding: 120px 0 60px; min-height: unset; }
   .services, .process, .team{ padding: 60px 0; }
   .cta{ padding: 0 0 60px; }
 }
@@ -1059,12 +1101,15 @@ img{ max-width: 100%; display: block; }
 .price-features svg{ color: var(--pine); flex-shrink: 0; margin-top: 3px; }
 .price-card .btn{ justify-content: center; width: 100%; }
 
-@media (max-width: 900px){
-  .pricing-grid{ grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 960px){
+  .pricing-grid{ grid-template-columns: repeat(2, 1fr); gap: 20px; }
   .price-card-featured{ order: -1; }
 }
 @media (max-width: 640px){
   .pricing-grid{ grid-template-columns: 1fr; }
+}
+@media (max-width: 480px){
+  .price-card{ padding: 26px 18px 22px; }
 }
 
 /* Visit Duration / Additional Care info cards */
@@ -1124,8 +1169,10 @@ img{ max-width: 100%; display: block; }
 .reassure-quote strong{ display:block; color: var(--cream); font-size: 0.85rem; }
 .reassure-quote span{ font-size: 0.78rem; color: rgba(251,247,239,0.65); }
 
-@media (max-width: 760px){
-  .reassure-inner{ padding: 30px 24px; }
+@media (max-width: 860px){
+  .reassure-inner{ padding: 32px 24px; flex-direction: column; align-items: flex-start; gap: 28px; }
+  .reassure-copy{ max-width: 100%; }
+  .reassure-quote{ max-width: 100%; width: 100%; box-sizing: border-box; }
 }
 
 /* Process (reused variant for narrower plan-page context) */
@@ -1155,7 +1202,10 @@ img{ max-width: 100%; display: block; }
 .addon-card h3{ font-size: 1rem; margin-bottom: 0.4em; }
 .addon-card p{ font-size: 0.86rem; margin: 0; }
 
-@media (max-width: 900px){
+@media (max-width: 960px){
+  .addons-grid{ grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px){
   .addons-grid{ grid-template-columns: 1fr; }
 }
 
@@ -1234,8 +1284,8 @@ img{ max-width: 100%; display: block; }
 .team-photo-contacts a{ text-decoration:none; font-weight: 600; font-size: 0.9rem; color: var(--pine-dark); }
 .team-photo-contacts a:hover{ text-decoration: underline; }
 
-@media (max-width: 700px){
-  .team-photo-grid{ grid-template-columns: 1fr; }
+@media (max-width: 768px){
+  .team-photo-grid{ grid-template-columns: 1fr; max-width: 380px; margin-left: auto; margin-right: auto; }
 }
 
 /* Values row reused on team page */
@@ -1313,6 +1363,10 @@ img{ max-width: 100%; display: block; }
 @media (max-width: 900px){
   .contact-grid{ grid-template-columns: 1fr; }
   .form-two-col{ grid-template-columns: 1fr; }
+}
+@media (max-width: 480px){
+  .contact-form{ padding: 24px 18px; }
+  .info-card{ padding: 22px 18px; }
 }
 /* ============================================
    Free Consultation modal (shared across pages)
@@ -1412,6 +1466,13 @@ body.modal-open{ overflow: hidden; }
 @media (max-width: 520px){
   .modal-body{ padding: 30px 22px 26px; }
 }
+@media (max-width: 480px){
+  .modal-overlay{ padding: 12px; }
+  .modal-body{ padding: 26px 16px 20px; }
+  .modal-close{ top: 12px; right: 12px; }
+  .phone-input-group .phone-prefix{ padding: 0 9px; font-size: 0.85rem; }
+  .phone-input-group input{ padding: 10px 12px; font-size: 0.88rem; }
+}
 
 /* ============================================
    Our Mission — small statement band under the hero
@@ -1475,9 +1536,9 @@ body.modal-open{ overflow: hidden; }
   text-align: center;
 }
 
-@media (max-width: 900px){
+@media (max-width: 960px){
   .showcase-grid{ grid-template-columns: 1fr; gap: 32px; margin-bottom: 48px; }
-  .showcase-photo{ order: -1; aspect-ratio: 16 / 10; }
+  .showcase-photo{ order: -1; aspect-ratio: 16 / 10; max-height: 400px; }
 }
 
 @media (max-width: 600px){

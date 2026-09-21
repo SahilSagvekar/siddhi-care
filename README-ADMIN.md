@@ -44,23 +44,16 @@ approach has no such ceiling.
    Settings → Developer settings → Fine-grained tokens → generate one scoped
    to just this repo, with **Contents: Read and write** permission.
 
-3. **Generate your admin password hash** — run this locally so the plaintext
-   password never touches the repo, chat, or anywhere else:
-   ```
-   node scripts/hash-password.js "your-chosen-password"
-   ```
-   Copy the printed hash.
-
-4. **Generate a session secret**:
+3. **Generate a session secret**:
    ```
    node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
    ```
 
-5. **Add environment variables in Vercel** (Project Settings → Environment
-   Variables) — see `.env.example` for the full list:
-   - `ADMIN_EMAIL`
-   - `ADMIN_PASSWORD_HASH` (from step 3)
-   - `SESSION_SECRET` (from step 4)
+4. **Add environment variables in Vercel** (Project Settings → Environment
+   Variables) — see `.env` for reference:
+   - `ADMIN_EMAIL` (your admin email)
+   - `ADMIN_PASSWORD` (your plain admin password)
+   - `SESSION_SECRET` (from step 3)
    - `GITHUB_TOKEN` (from step 2)
    - `GITHUB_OWNER`, `GITHUB_REPO`, `GITHUB_BRANCH`
 

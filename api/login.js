@@ -1,4 +1,3 @@
-const bcrypt = require('bcryptjs');
 const { createSessionToken, buildSetCookieHeader } = require('../lib/auth');
 
 // Simple in-memory throttle per serverless instance — not perfect (instances
@@ -42,19 +41,19 @@ module.exports = async (req, res) => {
   }
   const { email, password } = body || {};
 
-  const adminEmail = 'sahilsagvekar230@gmail.com';
-  const adminHash = '$2a$10$QEnnoHWy.KWRnqUhsWPV1OILmaosKJyp7m0A4V21rPnn13OWi.IGu'; // Replace with the actual hashed password
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
 
-  if (!adminEmail || !adminHash) {
-    res.status(500).json({ error: 'Admin login is not configured on the server.' });
+  if (!adminEmail || !adminPassword) {
+    res.status(500).json({ error: 'Admin login is not configured on the server. Please set ADMIN_EMAIL and ADMIN_PASSWORD in environment variables.' });
     return;
   }
 
   if (
     !email ||
     !password ||
-    String(email).toLowerCase() !== adminEmail.toLowerCase() ||
-    !bcrypt.compareSync(password, adminHash)
+    String(email).trim().toLowerCase() !== String(adminEmail).trim().toLowerCase() ||
+    String(password) !== String(adminPassword)
   ) {
     res.status(401).json({ error: 'Incorrect email or password.' });
     return;

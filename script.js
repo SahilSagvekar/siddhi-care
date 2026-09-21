@@ -37,7 +37,7 @@ window.addEventListener('scroll', toggleHeader, { passive: true });
   });
 
   window.addEventListener('resize', () => {
-    if (window.innerWidth > 900) closeNav();
+    if (window.innerWidth > 960) closeNav();
   });
 })();
 
