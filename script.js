@@ -41,28 +41,67 @@ window.addEventListener('scroll', toggleHeader, { passive: true });
   });
 })();
 
-// Motion-safe scroll reveal for the service cards and step list
+// Motion-safe scroll reveal with natural staggered wave entrance
 const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 if (!prefersReduced && 'IntersectionObserver' in window) {
-  const targets = document.querySelectorAll('.service-card, .team-card, .process-card, .process-steps li');
+  const targetSelector = [
+    '.service-card',
+    '.team-card',
+    '.process-card',
+    '.process-steps li',
+    '.resource-card',
+    '.testimonial-card',
+    '.addon-card',
+    '.price-card',
+    '.pricing-info-card',
+    '.team-photo-card',
+    '.gallery-item',
+    '.info-card'
+  ].join(', ');
+
+  const targets = document.querySelectorAll(targetSelector);
+  
   targets.forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(14px)';
-    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    el.classList.add('reveal-on-scroll');
+    
+    // Calculate index within direct parent or closest grid to create a staggered wave
+    const parent = el.parentElement;
+    if (parent) {
+      const siblings = Array.from(parent.children).filter(child => child.matches(targetSelector));
+      const idx = siblings.indexOf(el);
+      if (idx > -1) {
+        // Wave stagger up to 4 items in a row (0ms, 90ms, 180ms, 270ms)
+        const stagger = (idx % 4) * 90;
+        el.style.transitionDelay = `${stagger}ms`;
+      }
+    }
   });
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        entry.target.style.opacity = '1';
-        entry.target.style.transform = 'translateY(0)';
+        entry.target.classList.add('is-revealed');
         observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.15 });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
 
   targets.forEach(el => observer.observe(el));
+
+  // Observe .process-steps to trigger progressive sequential line connection
+  const processStepsContainers = document.querySelectorAll('.process-steps');
+  processStepsContainers.forEach(steps => {
+    const stepsObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-revealed');
+          stepsObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+    stepsObserver.observe(steps);
+  });
 }
 // ============================================
 // Free Consultation modal — shared across every page
