@@ -3,7 +3,7 @@
     "badge": "Our Services",
     "headingPart1": "Compassionate Care.",
     "headingPart2": "Reliable Support. ",
-    "headingEm": "Peace of Mind.",
+    "headingEm": "Peace of Mind. Mind.",
     "lede": "We provide trusted and dependable elderly care support to help seniors and their families manage everyday needs with comfort, safety, and confidence."
   },
   "trustBadges": {
@@ -95,7 +95,6 @@
     }
   },
   "coordinators": {
-    "lede": "24/7 Support Available. Reliable Care • Quick Assistance • Complete Peace of Mind — reach out to either of our care coordinators directly.",
     "0": {
       "name": "Diksha",
       "role": "Care Coordinator"
@@ -103,7 +102,8 @@
     "1": {
       "name": "Suraj",
       "role": "Care Coordinator"
-    }
+    },
+    "lede": "24/7 Support Available. Reliable Care • Quick Assistance • Complete Peace of Mind — reach out to either of our care coordinators directly."
   },
   "cta": {
     "badge": "24/7 Support Available",
