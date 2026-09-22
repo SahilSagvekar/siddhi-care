@@ -138,16 +138,17 @@
   }
   .invoice-sheet.is-paid .invoice-paid-stamp{ display:block; }
 
-  @media print{
-    @page{ margin:14mm; }
-    body *{ visibility:hidden; }
-    .invoice-sheet, .invoice-sheet *{ visibility:visible; }
-    .invoice-wrap, .invoice-sheet{ position:static !important; width:auto !important; margin:0 !important; }
-    .invoice-sheet{ border:none; border-radius:0; padding:0; box-shadow:none; }
-    .invoice-sheet::before{ display:none; }
-    .invoice-sheet input, .invoice-sheet textarea{ border:none !important; background:transparent !important; padding:2px 4px; }
-    .no-print{ display:none !important; }
-  }
+@media print{
+  @page{ margin:14mm; }
+  html, body{ background:#fff; }
+  .wrap{ padding:0 !important; margin:0 !important; max-width:none !important; }
+  .no-print{ display:none !important; }
+  .invoice-wrap, .invoice-sheet{ position:static !important; width:auto !important; margin:0 !important; }
+  .invoice-sheet{ border:none; border-radius:0; padding:0; box-shadow:none; }
+  .invoice-sheet::before{ display:none; }
+  .invoice-sheet input, .invoice-sheet textarea{ border:none !important; background:transparent !important; padding:2px 4px; resize:none !important; }
+  .totals-row input{ padding:0 2px !important; }
+}
 </style>
 </head>
 <body>
@@ -236,15 +237,15 @@
 
   function renderEditorShell(email) {
     app.innerHTML = `
-      <div class="topbar">
+            <div class="topbar no-print">
         <div>
           <h1>Edit site content</h1>
           <p class="sub">Signed in as ${escapeHtml(email)}</p>
         </div>
         <button class="btn btn-secondary" id="logoutBtn">Sign out</button>
       </div>
-      <div class="page-picker" id="pagePicker"></div>
-      <div class="page-picker" id="toolsPicker"></div>
+      <div class="page-picker no-print" id="pagePicker"></div>
+      <div class="page-picker no-print" id="toolsPicker"></div>
       <div id="editorArea"><p id="loading">Choose a page above to start editing.</p></div>
     `;
     document.getElementById('logoutBtn').addEventListener('click', async () => {
