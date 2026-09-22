@@ -46,12 +46,17 @@
 
   /* Editor */
   .topbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
-  .page-picker{ display:flex; gap:8px; flex-wrap:wrap; }
+  .page-picker{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
   .page-picker button{
     background:#fff; border:1px solid var(--line); border-radius:999px;
     padding:8px 16px; font-size:0.85rem; font-weight:600; color:var(--ink-soft);
   }
   .page-picker button.is-active{ background:var(--pine-dark); color:#fff; border-color:var(--pine-dark); }
+  .tools-label{
+    flex-basis:100%; margin:0 0 2px; font-size:0.68rem; font-weight:700;
+    letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-soft);
+  }
+  #toolsPicker{ padding-top:14px; margin-bottom:24px; border-top:1px dashed var(--line); }
   .group{ background:#fff; border:1px solid var(--line); border-radius:var(--radius-lg); padding:22px 22px 6px; margin-bottom:18px; }
   .group > .group-title{ font-weight:700; font-size:0.95rem; margin:0 0 14px; color:var(--pine-dark); text-transform:capitalize; }
   .group .group{ background:var(--cream); }
@@ -64,51 +69,83 @@
   /* Invoice tool */
   .invoice-toolbar{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
   .invoice-toolbar .btn{ width:auto; }
+  .invoice-toolbar .btn-ghost{
+    background:transparent; color:var(--pine-dark); border:1.5px solid var(--line);
+    border-radius:999px; padding:10px 18px; font-size:0.85rem; font-weight:700;
+  }
+  .invoice-toolbar .btn-ghost.is-paid{ background:var(--pine); color:#fff; border-color:var(--pine); }
+  .invoice-wrap{ position:relative; max-width:800px; }
   .invoice-sheet{
+    position:relative; overflow:hidden;
     background:#fff; border:1px solid var(--line); border-radius:var(--radius-lg);
-    padding:36px 40px; max-width:800px;
+    padding:40px 44px 32px; box-shadow:0 1px 2px rgba(36,31,24,0.04), 0 16px 40px -20px rgba(36,31,24,0.25);
+  }
+  .invoice-sheet::before{
+    content:''; position:absolute; top:0; left:0; right:0; height:6px;
+    background:linear-gradient(90deg, var(--pine-dark), var(--pine) 55%, var(--marigold));
   }
   .invoice-sheet input, .invoice-sheet textarea{
-    font-family:inherit; border:1px solid transparent; border-radius:6px;
-    background:transparent; color:var(--ink); padding:3px 6px; width:100%;
+    font-family:inherit; font-size:0.9rem; border:1px solid transparent; border-radius:6px;
+    background:transparent; color:var(--ink); padding:4px 7px; width:100%; transition:background 0.15s, border-color 0.15s;
   }
-  .invoice-sheet input:hover, .invoice-sheet textarea:hover{ border-color:var(--line); }
+  .invoice-sheet input:hover, .invoice-sheet textarea:hover{ border-color:var(--line); background:var(--cream); }
   .invoice-sheet input:focus, .invoice-sheet textarea:focus{ outline:none; border-color:var(--pine); background:var(--cream); }
   .invoice-sheet textarea{ resize:vertical; min-height:40px; }
-  .invoice-head{ display:flex; justify-content:space-between; gap:24px; padding-bottom:20px; border-bottom:2px solid var(--ink); flex-wrap:wrap; }
+  .invoice-head{ display:flex; justify-content:space-between; gap:24px; padding-bottom:22px; border-bottom:2px solid var(--ink); flex-wrap:wrap; }
   .invoice-brand{ display:flex; gap:14px; align-items:flex-start; }
-  .invoice-logo{ width:52px; height:52px; object-fit:contain; }
-  .invoice-company-name{ margin:0; font-weight:700; font-size:1.05rem; color:var(--pine-dark); }
-  .invoice-company-sub, .invoice-company-contact{ margin:2px 0 0; font-size:0.8rem; color:var(--ink-soft); }
+  .invoice-logo-tile{
+    width:56px; height:56px; border-radius:14px; background:var(--sand);
+    display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .invoice-logo{ width:36px; height:36px; object-fit:contain; }
+  .invoice-company-name{ margin:0; font-weight:700; font-size:1.1rem; letter-spacing:0.01em; color:var(--pine-dark); }
+  .invoice-company-sub, .invoice-company-contact{ margin:3px 0 0; font-size:0.8rem; color:var(--ink-soft); }
   .invoice-meta{ text-align:right; min-width:220px; }
-  .invoice-meta h2{ margin:0 0 10px; letter-spacing:0.08em; color:var(--pine-dark); font-size:1.3rem; }
+  .invoice-meta h2{ margin:0 0 12px; letter-spacing:0.14em; color:var(--pine-dark); font-size:1.4rem; font-weight:800; }
   .meta-row{ display:flex; justify-content:flex-end; align-items:center; gap:8px; font-size:0.85rem; margin-bottom:4px; }
-  .meta-row label{ color:var(--ink-soft); font-weight:600; white-space:nowrap; }
+  .meta-row label{ color:var(--ink-soft); font-weight:600; white-space:nowrap; min-width:38px; text-align:left; }
   .meta-row input{ text-align:right; max-width:150px; }
-  .invoice-parties{ padding:20px 0; }
-  .party-label{ font-size:0.72rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 6px; }
+  .invoice-parties{ padding:22px 0; display:flex; justify-content:space-between; gap:24px; flex-wrap:wrap; }
+  .invoice-parties > div{ flex:1; min-width:220px; }
+  .party-label{ font-size:0.72rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--pine); margin:0 0 8px; }
   .invoice-table{ width:100%; border-collapse:collapse; margin-top:4px; }
-  .invoice-table th{ text-align:left; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft); border-bottom:1.5px solid var(--ink); padding:6px 8px; }
-  .invoice-table td{ border-bottom:1px solid var(--line); padding:6px 8px; vertical-align:top; }
+  .invoice-table thead th{ text-align:left; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); background:var(--sand); border-bottom:1.5px solid var(--ink); padding:9px 8px; }
+  .invoice-table thead th:first-child{ border-top-left-radius:8px; }
+  .invoice-table thead th:last-child{ border-top-right-radius:8px; }
+  .invoice-table td{ border-bottom:1px solid var(--line); padding:7px 8px; vertical-align:top; }
+  .invoice-table tbody tr:hover td{ background:var(--cream); }
   .invoice-table th:nth-child(2), .invoice-table td:nth-child(2),
   .invoice-table th:nth-child(3), .invoice-table td:nth-child(3),
   .invoice-table th:nth-child(4), .invoice-table td:nth-child(4){ text-align:right; width:110px; }
   .invoice-table input{ text-align:right; }
   .invoice-table td:first-child input{ text-align:left; }
-  .row-remove-btn{ background:none; border:none; color:var(--clayrose); font-size:1.1rem; line-height:1; padding:4px; }
-  .add-row-btn{ margin-top:10px; background:var(--cream); border:1.5px dashed var(--line); border-radius:8px; padding:8px 14px; font-size:0.85rem; font-weight:600; color:var(--ink-soft); width:100%; }
-  .invoice-totals{ margin:18px 0 0 auto; max-width:260px; }
-  .totals-row{ display:flex; justify-content:space-between; font-size:0.9rem; padding:5px 0; }
+  .row-amount{ font-weight:600; font-variant-numeric:tabular-nums; }
+  .row-remove-btn{ background:none; border:none; color:var(--clayrose); font-size:1.1rem; line-height:1; padding:4px; border-radius:6px; }
+  .row-remove-btn:hover{ background:rgba(184,92,86,0.1); }
+  .add-row-btn{ margin-top:10px; background:var(--cream); border:1.5px dashed var(--line); border-radius:8px; padding:9px 14px; font-size:0.85rem; font-weight:600; color:var(--pine-dark); width:100%; }
+  .add-row-btn:hover{ border-color:var(--pine); background:var(--sand); }
+  .invoice-totals{ margin:18px 0 0 auto; max-width:280px; background:var(--cream); border-radius:10px; padding:14px 16px; }
+  .totals-row{ display:flex; justify-content:space-between; align-items:center; font-size:0.9rem; padding:5px 0; }
   .totals-row input{ width:44px; text-align:right; display:inline-block; padding:0 3px; }
-  .total-final{ border-top:1.5px solid var(--ink); margin-top:4px; padding-top:8px; font-weight:700; font-size:1.05rem; color:var(--pine-dark); }
-  .invoice-notes{ margin-top:24px; }
-  .invoice-footer-note{ margin-top:28px; padding-top:14px; border-top:1px solid var(--line); font-size:0.8rem; color:var(--ink-soft); text-align:center; }
+  .total-final{ border-top:1.5px solid var(--ink); margin-top:6px; padding-top:10px; font-weight:800; font-size:1.15rem; color:var(--pine-dark); }
+  .invoice-notes{ margin-top:26px; }
+  .invoice-footer-note{ margin-top:30px; padding-top:16px; border-top:1px solid var(--line); font-size:0.8rem; color:var(--ink-soft); text-align:center; font-style:italic; }
+  .invoice-paid-stamp{
+    position:absolute; top:40%; right:8%; transform:translateY(-50%) rotate(-14deg);
+    font-size:2.6rem; font-weight:800; letter-spacing:0.12em; color:var(--pine);
+    border:5px solid var(--pine); border-radius:12px; padding:6px 22px; opacity:0.16;
+    pointer-events:none; text-transform:uppercase; display:none;
+  }
+  .invoice-sheet.is-paid .invoice-paid-stamp{ display:block; }
 
   @media print{
+    @page{ margin:14mm; }
     body *{ visibility:hidden; }
     .invoice-sheet, .invoice-sheet *{ visibility:visible; }
-    .invoice-sheet{ position:absolute; top:0; left:0; width:100%; margin:0; border:none; border-radius:0; padding:24px; box-shadow:none; }
-    .invoice-sheet input, .invoice-sheet textarea{ border:none !important; background:transparent !important; }
+    .invoice-wrap, .invoice-sheet{ position:static !important; width:auto !important; margin:0 !important; }
+    .invoice-sheet{ border:none; border-radius:0; padding:0; box-shadow:none; }
+    .invoice-sheet::before{ display:none; }
+    .invoice-sheet input, .invoice-sheet textarea{ border:none !important; background:transparent !important; padding:2px 4px; }
     .no-print{ display:none !important; }
   }
 </style>
@@ -223,6 +260,10 @@
     });
 
     const tools = document.getElementById('toolsPicker');
+    const toolsLabel = document.createElement('p');
+    toolsLabel.className = 'tools-label';
+    toolsLabel.textContent = 'Tools';
+    tools.appendChild(toolsLabel);
     const invoiceBtn = document.createElement('button');
     invoiceBtn.textContent = 'Invoicing';
     invoiceBtn.addEventListener('click', () => {
@@ -404,14 +445,16 @@
 
   function blankInvoice() {
     const today = new Date().toISOString().slice(0, 10);
+    const suffix = Math.floor(100 + Math.random() * 900); // avoids same-day number collisions; editable
     return {
-      number: `INV-${today.replace(/-/g, '')}`,
+      number: `INV-${today.replace(/-/g, '')}-${suffix}`,
       date: today,
       due: today,
       billName: '',
       billDetails: '',
       notes: 'Thank you for your business. Please make payment by the due date.',
       taxPct: 0,
+      paid: false,
       items: [{ desc: '', qty: 1, rate: 0 }],
     };
   }
@@ -443,54 +486,60 @@
     container.innerHTML = `
       <div class="invoice-toolbar no-print">
         <button type="button" class="btn" id="exportPdfBtn" style="width:auto;">Export as PDF</button>
+        <button type="button" class="btn-ghost${inv.paid ? ' is-paid' : ''}" id="paidToggleBtn">${inv.paid ? '✓ Marked as paid' : 'Mark as paid'}</button>
         <button type="button" class="btn btn-secondary" id="resetInvoiceBtn">Reset invoice</button>
         <span class="hint">Draft auto-saves in this browser only.</span>
       </div>
 
-      <div class="invoice-sheet" id="invoiceSheet">
-        <div class="invoice-head">
-          <div class="invoice-brand">
-            <img class="invoice-logo" src="../logo-mark.png" alt="SIDDHI ElderCare Services logo">
-            <div>
-              <p class="invoice-company-name">SIDDHI ElderCare Services</p>
-              <p class="invoice-company-sub">Home care for seniors &amp; adults — Mumbai &amp; Pune</p>
-              <p class="invoice-company-contact">8369 180 832 &middot; 7710 031 734</p>
+      <div class="invoice-wrap">
+        <div class="invoice-sheet${inv.paid ? ' is-paid' : ''}" id="invoiceSheet">
+          <span class="invoice-paid-stamp">Paid</span>
+          <div class="invoice-head">
+            <div class="invoice-brand">
+              <div class="invoice-logo-tile"><img class="invoice-logo" src="../logo-mark.png" alt="SIDDHI ElderCare Services logo"></div>
+              <div>
+                <p class="invoice-company-name">SIDDHI ElderCare Services</p>
+                <p class="invoice-company-sub">Home care for seniors &amp; adults — Mumbai &amp; Pune</p>
+                <p class="invoice-company-contact">8369 180 832 &middot; 7710 031 734</p>
+              </div>
+            </div>
+            <div class="invoice-meta">
+              <h2>INVOICE</h2>
+              <div class="meta-row"><label for="inv_number">No.</label><input id="inv_number" data-inv="number"></div>
+              <div class="meta-row"><label for="inv_date">Date</label><input id="inv_date" type="date" data-inv="date"></div>
+              <div class="meta-row"><label for="inv_due">Due</label><input id="inv_due" type="date" data-inv="due"></div>
             </div>
           </div>
-          <div class="invoice-meta">
-            <h2>INVOICE</h2>
-            <div class="meta-row"><label for="inv_number">No.</label><input id="inv_number" data-inv="number"></div>
-            <div class="meta-row"><label for="inv_date">Date</label><input id="inv_date" type="date" data-inv="date"></div>
-            <div class="meta-row"><label for="inv_due">Due</label><input id="inv_due" type="date" data-inv="due"></div>
+
+          <div class="invoice-parties">
+            <div>
+              <p class="party-label">Bill to</p>
+              <input id="inv_billName" data-inv="billName" placeholder="Client name">
+              <textarea id="inv_billDetails" data-inv="billDetails" placeholder="Address / phone number" style="min-height:36px;"></textarea>
+            </div>
           </div>
+
+          <table class="invoice-table">
+            <thead>
+              <tr><th>Description</th><th>Qty</th><th>Rate</th><th>Amount</th><th class="no-print"></th></tr>
+            </thead>
+            <tbody id="invoiceItems"></tbody>
+          </table>
+          <button type="button" class="add-row-btn no-print" id="addItemBtn">+ Add line item</button>
+
+          <div class="invoice-totals">
+            <div class="totals-row"><span>Subtotal</span><span id="invSubtotal">₹0.00</span></div>
+            <div class="totals-row"><span>Tax (<input type="number" min="0" step="0.1" id="inv_taxPct" data-inv="taxPct">%)</span><span id="invTax">₹0.00</span></div>
+            <div class="totals-row total-final"><span>Total</span><span id="invTotal">₹0.00</span></div>
+          </div>
+
+          <div class="invoice-notes">
+            <p class="party-label">Notes</p>
+            <textarea id="inv_notes" data-inv="notes"></textarea>
+          </div>
+
+          <p class="invoice-footer-note">SIDDHI ElderCare Services &middot; Mumbai &amp; Pune</p>
         </div>
-
-        <div class="invoice-parties">
-          <p class="party-label">Bill to</p>
-          <input id="inv_billName" data-inv="billName" placeholder="Client name">
-          <textarea id="inv_billDetails" data-inv="billDetails" placeholder="Address / phone number" style="min-height:36px;"></textarea>
-        </div>
-
-        <table class="invoice-table">
-          <thead>
-            <tr><th>Description</th><th>Qty</th><th>Rate</th><th>Amount</th><th class="no-print"></th></tr>
-          </thead>
-          <tbody id="invoiceItems"></tbody>
-        </table>
-        <button type="button" class="add-row-btn no-print" id="addItemBtn">+ Add line item</button>
-
-        <div class="invoice-totals">
-          <div class="totals-row"><span>Subtotal</span><span id="invSubtotal">₹0.00</span></div>
-          <div class="totals-row"><span>Tax (<input type="number" min="0" step="0.1" id="inv_taxPct" data-inv="taxPct">%)</span><span id="invTax">₹0.00</span></div>
-          <div class="totals-row total-final"><span>Total</span><span id="invTotal">₹0.00</span></div>
-        </div>
-
-        <div class="invoice-notes">
-          <p class="party-label">Notes</p>
-          <textarea id="inv_notes" data-inv="notes"></textarea>
-        </div>
-
-        <p class="invoice-footer-note">SIDDHI ElderCare Services &middot; Mumbai &amp; Pune</p>
       </div>
     `;
 
@@ -555,6 +604,16 @@
       if (!confirm('Clear this invoice and start a new one?')) return;
       localStorage.removeItem(INVOICE_DRAFT_KEY);
       renderInvoiceUI(container);
+    });
+
+    document.getElementById('paidToggleBtn').addEventListener('click', () => {
+      inv.paid = !inv.paid;
+      saveInvoiceDraft(inv);
+      const sheet = document.getElementById('invoiceSheet');
+      const btn = document.getElementById('paidToggleBtn');
+      sheet.classList.toggle('is-paid', inv.paid);
+      btn.classList.toggle('is-paid', inv.paid);
+      btn.textContent = inv.paid ? '✓ Marked as paid' : 'Mark as paid';
     });
 
     document.getElementById('exportPdfBtn').addEventListener('click', () => {
