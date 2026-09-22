@@ -60,6 +60,57 @@
   .save-bar .btn{ width:auto; }
   .hint{ font-size:0.78rem; color:var(--ink-soft); }
   #loading{ color:var(--ink-soft); font-size:0.9rem; }
+
+  /* Invoice tool */
+  .invoice-toolbar{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+  .invoice-toolbar .btn{ width:auto; }
+  .invoice-sheet{
+    background:#fff; border:1px solid var(--line); border-radius:var(--radius-lg);
+    padding:36px 40px; max-width:800px;
+  }
+  .invoice-sheet input, .invoice-sheet textarea{
+    font-family:inherit; border:1px solid transparent; border-radius:6px;
+    background:transparent; color:var(--ink); padding:3px 6px; width:100%;
+  }
+  .invoice-sheet input:hover, .invoice-sheet textarea:hover{ border-color:var(--line); }
+  .invoice-sheet input:focus, .invoice-sheet textarea:focus{ outline:none; border-color:var(--pine); background:var(--cream); }
+  .invoice-sheet textarea{ resize:vertical; min-height:40px; }
+  .invoice-head{ display:flex; justify-content:space-between; gap:24px; padding-bottom:20px; border-bottom:2px solid var(--ink); flex-wrap:wrap; }
+  .invoice-brand{ display:flex; gap:14px; align-items:flex-start; }
+  .invoice-logo{ width:52px; height:52px; object-fit:contain; }
+  .invoice-company-name{ margin:0; font-weight:700; font-size:1.05rem; color:var(--pine-dark); }
+  .invoice-company-sub, .invoice-company-contact{ margin:2px 0 0; font-size:0.8rem; color:var(--ink-soft); }
+  .invoice-meta{ text-align:right; min-width:220px; }
+  .invoice-meta h2{ margin:0 0 10px; letter-spacing:0.08em; color:var(--pine-dark); font-size:1.3rem; }
+  .meta-row{ display:flex; justify-content:flex-end; align-items:center; gap:8px; font-size:0.85rem; margin-bottom:4px; }
+  .meta-row label{ color:var(--ink-soft); font-weight:600; white-space:nowrap; }
+  .meta-row input{ text-align:right; max-width:150px; }
+  .invoice-parties{ padding:20px 0; }
+  .party-label{ font-size:0.72rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 6px; }
+  .invoice-table{ width:100%; border-collapse:collapse; margin-top:4px; }
+  .invoice-table th{ text-align:left; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft); border-bottom:1.5px solid var(--ink); padding:6px 8px; }
+  .invoice-table td{ border-bottom:1px solid var(--line); padding:6px 8px; vertical-align:top; }
+  .invoice-table th:nth-child(2), .invoice-table td:nth-child(2),
+  .invoice-table th:nth-child(3), .invoice-table td:nth-child(3),
+  .invoice-table th:nth-child(4), .invoice-table td:nth-child(4){ text-align:right; width:110px; }
+  .invoice-table input{ text-align:right; }
+  .invoice-table td:first-child input{ text-align:left; }
+  .row-remove-btn{ background:none; border:none; color:var(--clayrose); font-size:1.1rem; line-height:1; padding:4px; }
+  .add-row-btn{ margin-top:10px; background:var(--cream); border:1.5px dashed var(--line); border-radius:8px; padding:8px 14px; font-size:0.85rem; font-weight:600; color:var(--ink-soft); width:100%; }
+  .invoice-totals{ margin:18px 0 0 auto; max-width:260px; }
+  .totals-row{ display:flex; justify-content:space-between; font-size:0.9rem; padding:5px 0; }
+  .totals-row input{ width:44px; text-align:right; display:inline-block; padding:0 3px; }
+  .total-final{ border-top:1.5px solid var(--ink); margin-top:4px; padding-top:8px; font-weight:700; font-size:1.05rem; color:var(--pine-dark); }
+  .invoice-notes{ margin-top:24px; }
+  .invoice-footer-note{ margin-top:28px; padding-top:14px; border-top:1px solid var(--line); font-size:0.8rem; color:var(--ink-soft); text-align:center; }
+
+  @media print{
+    body *{ visibility:hidden; }
+    .invoice-sheet, .invoice-sheet *{ visibility:visible; }
+    .invoice-sheet{ position:absolute; top:0; left:0; width:100%; margin:0; border:none; border-radius:0; padding:24px; box-shadow:none; }
+    .invoice-sheet input, .invoice-sheet textarea{ border:none !important; background:transparent !important; }
+    .no-print{ display:none !important; }
+  }
 </style>
 </head>
 <body>
@@ -156,6 +207,7 @@
         <button class="btn btn-secondary" id="logoutBtn">Sign out</button>
       </div>
       <div class="page-picker" id="pagePicker"></div>
+      <div class="page-picker" id="toolsPicker"></div>
       <div id="editorArea"><p id="loading">Choose a page above to start editing.</p></div>
     `;
     document.getElementById('logoutBtn').addEventListener('click', async () => {
@@ -169,6 +221,16 @@
       btn.addEventListener('click', () => loadPage(page, btn));
       picker.appendChild(btn);
     });
+
+    const tools = document.getElementById('toolsPicker');
+    const invoiceBtn = document.createElement('button');
+    invoiceBtn.textContent = 'Invoicing';
+    invoiceBtn.addEventListener('click', () => {
+      document.querySelectorAll('.page-picker button').forEach((b) => b.classList.remove('is-active'));
+      invoiceBtn.classList.add('is-active');
+      renderInvoiceUI(document.getElementById('editorArea'));
+    });
+    tools.appendChild(invoiceBtn);
   }
 
   async function loadPage(page, btnEl) {
@@ -330,6 +392,193 @@
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+  }
+
+  // ---------- Invoice tool ----------
+  // Purely client-side: nothing here is sent to the server or committed to
+  // the repo. Draft is kept in this browser's localStorage so a refresh
+  // doesn't lose it. "Export as PDF" uses the browser's print dialog, scoped
+  // by a print stylesheet to show only the invoice sheet — choosing
+  // "Save as PDF" there produces the exported file.
+  const INVOICE_DRAFT_KEY = 'siddhi_invoice_draft_v1';
+
+  function blankInvoice() {
+    const today = new Date().toISOString().slice(0, 10);
+    return {
+      number: `INV-${today.replace(/-/g, '')}`,
+      date: today,
+      due: today,
+      billName: '',
+      billDetails: '',
+      notes: 'Thank you for your business. Please make payment by the due date.',
+      taxPct: 0,
+      items: [{ desc: '', qty: 1, rate: 0 }],
+    };
+  }
+
+  function loadInvoiceDraft() {
+    try {
+      const raw = localStorage.getItem(INVOICE_DRAFT_KEY);
+      if (!raw) return blankInvoice();
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed.items) || !parsed.items.length) parsed.items = blankInvoice().items;
+      return parsed;
+    } catch {
+      return blankInvoice();
+    }
+  }
+
+  function saveInvoiceDraft(inv) {
+    try { localStorage.setItem(INVOICE_DRAFT_KEY, JSON.stringify(inv)); } catch {}
+  }
+
+  function formatMoney(n) {
+    const num = Number(n) || 0;
+    return `₹${num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+
+  function renderInvoiceUI(container) {
+    const inv = loadInvoiceDraft();
+
+    container.innerHTML = `
+      <div class="invoice-toolbar no-print">
+        <button type="button" class="btn" id="exportPdfBtn" style="width:auto;">Export as PDF</button>
+        <button type="button" class="btn btn-secondary" id="resetInvoiceBtn">Reset invoice</button>
+        <span class="hint">Draft auto-saves in this browser only.</span>
+      </div>
+
+      <div class="invoice-sheet" id="invoiceSheet">
+        <div class="invoice-head">
+          <div class="invoice-brand">
+            <img class="invoice-logo" src="../logo-mark.png" alt="SIDDHI ElderCare Services logo">
+            <div>
+              <p class="invoice-company-name">SIDDHI ElderCare Services</p>
+              <p class="invoice-company-sub">Home care for seniors &amp; adults — Mumbai &amp; Pune</p>
+              <p class="invoice-company-contact">8369 180 832 &middot; 7710 031 734</p>
+            </div>
+          </div>
+          <div class="invoice-meta">
+            <h2>INVOICE</h2>
+            <div class="meta-row"><label for="inv_number">No.</label><input id="inv_number" data-inv="number"></div>
+            <div class="meta-row"><label for="inv_date">Date</label><input id="inv_date" type="date" data-inv="date"></div>
+            <div class="meta-row"><label for="inv_due">Due</label><input id="inv_due" type="date" data-inv="due"></div>
+          </div>
+        </div>
+
+        <div class="invoice-parties">
+          <p class="party-label">Bill to</p>
+          <input id="inv_billName" data-inv="billName" placeholder="Client name">
+          <textarea id="inv_billDetails" data-inv="billDetails" placeholder="Address / phone number" style="min-height:36px;"></textarea>
+        </div>
+
+        <table class="invoice-table">
+          <thead>
+            <tr><th>Description</th><th>Qty</th><th>Rate</th><th>Amount</th><th class="no-print"></th></tr>
+          </thead>
+          <tbody id="invoiceItems"></tbody>
+        </table>
+        <button type="button" class="add-row-btn no-print" id="addItemBtn">+ Add line item</button>
+
+        <div class="invoice-totals">
+          <div class="totals-row"><span>Subtotal</span><span id="invSubtotal">₹0.00</span></div>
+          <div class="totals-row"><span>Tax (<input type="number" min="0" step="0.1" id="inv_taxPct" data-inv="taxPct">%)</span><span id="invTax">₹0.00</span></div>
+          <div class="totals-row total-final"><span>Total</span><span id="invTotal">₹0.00</span></div>
+        </div>
+
+        <div class="invoice-notes">
+          <p class="party-label">Notes</p>
+          <textarea id="inv_notes" data-inv="notes"></textarea>
+        </div>
+
+        <p class="invoice-footer-note">SIDDHI ElderCare Services &middot; Mumbai &amp; Pune</p>
+      </div>
+    `;
+
+    // Populate top-level fields
+    container.querySelectorAll('[data-inv]').forEach((el) => {
+      const key = el.dataset.inv;
+      if (key in inv) el.value = inv[key];
+      el.addEventListener('input', () => {
+        inv[key] = el.type === 'number' ? Number(el.value) : el.value;
+        saveInvoiceDraft(inv);
+        recalcInvoiceTotals(inv);
+      });
+    });
+
+    const itemsBody = document.getElementById('invoiceItems');
+    function renderItemRow(item, index) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input data-field="desc" placeholder="Service / item description"></td>
+        <td><input data-field="qty" type="number" min="0" step="1"></td>
+        <td><input data-field="rate" type="number" min="0" step="0.01"></td>
+        <td class="row-amount">₹0.00</td>
+        <td class="no-print"><button type="button" class="row-remove-btn" title="Remove line" aria-label="Remove line">&times;</button></td>
+      `;
+      tr.querySelector('[data-field="desc"]').value = item.desc;
+      tr.querySelector('[data-field="qty"]').value = item.qty;
+      tr.querySelector('[data-field="rate"]').value = item.rate;
+
+      tr.querySelectorAll('input').forEach((el) => {
+        el.addEventListener('input', () => {
+          const field = el.dataset.field;
+          inv.items[index][field] = field === 'desc' ? el.value : Number(el.value);
+          saveInvoiceDraft(inv);
+          recalcInvoiceTotals(inv);
+        });
+      });
+      tr.querySelector('.row-remove-btn').addEventListener('click', () => {
+        if (inv.items.length <= 1) return;
+        inv.items.splice(index, 1);
+        saveInvoiceDraft(inv);
+        renderItemsList();
+        recalcInvoiceTotals(inv);
+      });
+      return tr;
+    }
+
+    function renderItemsList() {
+      itemsBody.innerHTML = '';
+      inv.items.forEach((item, i) => itemsBody.appendChild(renderItemRow(item, i)));
+    }
+    renderItemsList();
+    recalcInvoiceTotals(inv);
+
+    document.getElementById('addItemBtn').addEventListener('click', () => {
+      inv.items.push({ desc: '', qty: 1, rate: 0 });
+      saveInvoiceDraft(inv);
+      renderItemsList();
+      recalcInvoiceTotals(inv);
+    });
+
+    document.getElementById('resetInvoiceBtn').addEventListener('click', () => {
+      if (!confirm('Clear this invoice and start a new one?')) return;
+      localStorage.removeItem(INVOICE_DRAFT_KEY);
+      renderInvoiceUI(container);
+    });
+
+    document.getElementById('exportPdfBtn').addEventListener('click', () => {
+      window.print();
+    });
+  }
+
+  function recalcInvoiceTotals(inv) {
+    const rows = document.querySelectorAll('#invoiceItems tr');
+    let subtotal = 0;
+    inv.items.forEach((item, i) => {
+      const amount = (Number(item.qty) || 0) * (Number(item.rate) || 0);
+      subtotal += amount;
+      const cell = rows[i] && rows[i].querySelector('.row-amount');
+      if (cell) cell.textContent = formatMoney(amount);
+    });
+    const taxPct = Number(inv.taxPct) || 0;
+    const tax = subtotal * (taxPct / 100);
+    const subtotalEl = document.getElementById('invSubtotal');
+    const taxEl = document.getElementById('invTax');
+    const totalEl = document.getElementById('invTotal');
+    if (subtotalEl) subtotalEl.textContent = formatMoney(subtotal);
+    if (taxEl) taxEl.textContent = formatMoney(tax);
+    if (totalEl) totalEl.textContent = formatMoney(subtotal + tax);
   }
 
   boot();
