@@ -197,8 +197,8 @@ if (!prefersReduced && 'IntersectionObserver' in window) {
 // ============================================
 (function () {
   const CONTACTS = [
-    { name: 'Diksha', role: 'Care Coordinator', phone: '918369180832' },
-    { name: 'Suraj', role: 'Care Coordinator', phone: '918976100341' },
+    { name: 'Diksha', role: 'Care Coordinator', phone: '917710031734' },
+    { name: 'Suraj', role: 'Care Coordinator', phone: '919136648667' },
   ];
   const MESSAGE = "Hi! I'd like to know more about SIDDHI ElderCare Services.";
 
