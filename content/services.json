@@ -45,13 +45,33 @@
       "learnMore": "Learn More"
     },
     "5": {
-      "title": "Paperwork & Billing Support",
+      "title": "Banking & Billing Support",
       "description": "Assistance with documentation, medical paperwork, bills, and related administrative tasks.",
       "learnMore": "Learn More"
     },
     "6": {
       "title": "Travelling Support",
       "description": "Support and coordination for local or outstation travel, appointments, and essential journeys.",
+      "learnMore": "Learn More"
+    },
+    "7": {
+      "title": "Hospital Setup At Home",
+      "description": "Setting up hospital-grade beds, equipment, and monitoring at home for recovery or long-term care.",
+      "learnMore": "Learn More"
+    },
+    "8": {
+      "title": "Care Taker & Nurse Arrangement",
+      "description": "Arranging trained caretakers and nurses for daily assistance, personal care, and companionship.",
+      "learnMore": "Learn More"
+    },
+    "9": {
+      "title": "Doctor Arrangement For Video Consultation & Home Visit",
+      "description": "Connecting with doctors for video consultations or arranging in-person home visits, whichever suits the need.",
+      "learnMore": "Learn More"
+    },
+    "10": {
+      "title": "Ambulance Support",
+      "description": "Quick ambulance arrangement for emergencies and scheduled hospital transfers.",
       "learnMore": "Learn More"
     }
   },
@@ -85,7 +105,7 @@
         "description": "Help with transportation, delivery, coordination, and other essential arrangements."
       },
       "5": {
-        "title": "Paperwork & Billing Support",
+        "title": "Banking & Billing Support",
         "description": "Assistance with documentation, medical paperwork, bills, and related administrative tasks."
       },
       "6": {
