@@ -1,0 +1,131 @@
+/* ============================================
+   Article pages + Resources page
+   Loaded after style.css on the article pages and resources.html.
+   Uses the design tokens defined in style.css (:root).
+   ============================================ */
+
+/* Hero additions */
+.article-hero-inner{ max-width: 760px; }
+.article-hero-inner h1{ font-size: clamp(1.9rem, 4.2vw, 2.9rem); }
+.article-meta{
+  margin: 20px 0 0;
+  font-size: 0.85rem;
+  color: rgba(251,247,239,0.7);
+}
+
+/* Reading column */
+.article{ padding: 48px 0 24px; }
+.article-wrap{ max-width: 740px; margin: 0 auto; }
+
+.breadcrumb{
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  margin-bottom: 32px;
+}
+.breadcrumb a{ color: var(--pine); text-decoration: none; font-weight: 600; }
+.breadcrumb a:hover{ text-decoration: underline; }
+.breadcrumb span{ margin: 0 6px; opacity: 0.6; }
+
+.article-body p,
+.article-body li{
+  font-size: 1.06rem;
+  line-height: 1.75;
+  color: var(--ink);
+}
+.article-body p{ margin: 0 0 1.15em; }
+.article-body .article-lead{
+  font-size: 1.22rem;
+  line-height: 1.65;
+  color: var(--pine-dark);
+  padding-bottom: 1.1em;
+  margin-bottom: 0.6em;
+  border-bottom: 1px solid var(--line);
+}
+.article-body h2{
+  font-size: clamp(1.3rem, 2.6vw, 1.6rem);
+  margin: 2.1em 0 0.55em;
+}
+.article-body ul,
+.article-body ol{
+  margin: 0 0 1.3em;
+  padding-left: 1.3em;
+}
+.article-body li{ margin-bottom: 0.65em; padding-left: 0.2em; }
+.article-body li::marker{ color: var(--clayrose); font-weight: 700; }
+.article-body strong{ color: var(--pine-dark); font-weight: 600; }
+
+/* Call-to-action box at the end of an article */
+.article-cta{
+  margin: 56px 0 0;
+  padding: 36px 32px;
+  background: var(--pine-dark);
+  color: rgba(251,247,239,0.85);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+.article-cta h2{ color: var(--cream); font-size: 1.5rem; margin: 0 0 0.4em; }
+.article-cta p{ margin: 0 auto 1.4em; max-width: 46ch; font-size: 0.98rem; }
+.article-cta-actions{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: center;
+  justify-content: center;
+}
+.article-cta-call{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--cream);
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-decoration: none;
+}
+.article-cta-call:hover{ color: var(--marigold); }
+
+/* "More guides" block under an article */
+.article-more{ padding: 64px 0 88px; }
+.article-more-title{
+  text-align: center;
+  font-size: 1.5rem;
+  margin: 0;
+}
+.article-more-grid{
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 32px;
+}
+@media (max-width: 640px){
+  .article-more-grid{ grid-template-columns: 1fr; }
+}
+
+/* Resources page */
+.resources-page{ padding-top: 56px; }
+.resources-page .resources-grid{ margin-top: 0; }
+
+@media (max-width: 600px){
+  .article{ padding-top: 32px; }
+  .article-cta{ padding: 28px 20px; }
+}
+
+/* Featured image at the top of an article */
+.article-figure{
+  margin: 0 0 40px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--sand);
+  box-shadow: var(--shadow-soft);
+}
+.article-figure img{
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 460px;
+  object-fit: cover;
+}
+@media (max-width: 600px){
+  .article-figure{ margin-bottom: 28px; border-radius: var(--radius); }
+  .article-figure img{ max-height: 280px; }
+}
