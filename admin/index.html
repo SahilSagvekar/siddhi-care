@@ -164,12 +164,13 @@
   .invoice-sheet.is-paid .invoice-paid-stamp{ display:block; }
 
 @media print{
-  @page{ margin:14mm; }
+  /* Zero page margin stops the browser printing its own header/footer (page URL, date, title). The spacing lives on the sheet instead. */
+  @page{ margin:0; }
   html, body{ background:#fff; }
   .wrap{ padding:0 !important; margin:0 !important; max-width:none !important; }
   .no-print{ display:none !important; }
   .invoice-wrap, .invoice-sheet{ position:static !important; width:auto !important; margin:0 !important; }
-  .invoice-sheet{ border:none; border-radius:0; padding:0; box-shadow:none; }
+  .invoice-sheet{ border:none; border-radius:0; padding:14mm !important; box-shadow:none; }
   .invoice-sheet::before{ display:none; }
   .invoice-sheet input, .invoice-sheet textarea{ border:none !important; background:transparent !important; padding:2px 4px; resize:none !important; }
   .totals-row input{ padding:0 2px !important; }
@@ -497,6 +498,7 @@
       received: 0,
       paymentMode: '',
       bankAccount: '',
+      taxPct: 0,
       paid: false,
     };
   }
@@ -622,6 +624,7 @@
             </div>
             <div class="invoice-totals">
               <div class="totals-row"><span>Sub total</span><span id="invSubtotal">₹0.00</span></div>
+              <div class="totals-row"><span>GST (<input type="number" min="0" step="0.1" id="inv_taxPct" data-inv="taxPct" aria-label="GST percent">%)</span><span id="invTax">₹0.00</span></div>
               <div class="totals-row total-final"><span>Total</span><span id="invTotal">₹0.00</span></div>
               <div class="totals-row"><span>Received</span><input class="money-input" type="number" min="0" step="0.01" id="inv_received" data-inv="received"></div>
               <div class="totals-row"><span>Balance</span><span id="invBalance">₹0.00</span></div>
@@ -743,12 +746,15 @@
       if (cell) cell.textContent = formatMoney(amount);
     });
     subtotal = round2(subtotal);
-    const total = subtotal;
+    const taxPct = Number(inv.taxPct) || 0;
+    const tax = round2(subtotal * (taxPct / 100));
+    const total = round2(subtotal + tax);
     const balance = round2(total - (Number(inv.received) || 0));
     const setText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
     setText('invQtyTotal', String(qtyTotal));
-    setText('invAmountTotal', formatMoney(total));
+    setText('invAmountTotal', formatMoney(subtotal));
     setText('invSubtotal', formatMoney(subtotal));
+    setText('invTax', formatMoney(tax));
     setText('invTotal', formatMoney(total));
     setText('invBalance', formatMoney(balance));
     setText('invWords', amountInWords(total));
