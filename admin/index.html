@@ -114,17 +114,42 @@
   .invoice-table thead th:last-child{ border-top-right-radius:8px; }
   .invoice-table td{ border-bottom:1px solid var(--line); padding:7px 8px; vertical-align:top; }
   .invoice-table tbody tr:hover td{ background:var(--cream); }
-  .invoice-table th:nth-child(2), .invoice-table td:nth-child(2),
+  .invoice-table th:nth-child(1), .invoice-table td:nth-child(1){ width:34px; }
   .invoice-table th:nth-child(3), .invoice-table td:nth-child(3),
-  .invoice-table th:nth-child(4), .invoice-table td:nth-child(4){ text-align:right; width:110px; }
+  .invoice-table th:nth-child(4), .invoice-table td:nth-child(4),
+  .invoice-table th:nth-child(5), .invoice-table td:nth-child(5){ text-align:right; width:110px; }
   .invoice-table input{ text-align:right; }
-  .invoice-table td:first-child input{ text-align:left; }
+  .invoice-table td:nth-child(2) input{ text-align:left; }
+  .row-num{ color:var(--ink-soft); font-size:0.85rem; padding-top:11px !important; }
+  .table-total td{ font-weight:800; border-bottom:1.5px solid var(--ink); padding-top:10px; font-variant-numeric:tabular-nums; }
+  .table-total td:nth-child(2){ text-align:left; }
   .row-amount{ font-weight:600; font-variant-numeric:tabular-nums; }
   .row-remove-btn{ background:none; border:none; color:var(--clayrose); font-size:1.1rem; line-height:1; padding:4px; border-radius:6px; }
   .row-remove-btn:hover{ background:rgba(184,92,86,0.1); }
   .add-row-btn{ margin-top:10px; background:var(--cream); border:1.5px dashed var(--line); border-radius:8px; padding:9px 14px; font-size:0.85rem; font-weight:600; color:var(--pine-dark); width:100%; }
   .add-row-btn:hover{ border-color:var(--pine); background:var(--sand); }
-  .invoice-totals{ margin:18px 0 0 auto; max-width:280px; background:var(--cream); border-radius:10px; padding:14px 16px; }
+  .invoice-totals{ margin:18px 0 0 auto; max-width:300px; background:var(--cream); border-radius:10px; padding:14px 16px; }
+  .invoice-totals .totals-row input.money-input,
+  .invoice-totals .totals-row input.mode-input{ width:130px; text-align:right; padding:2px 0 2px 6px; }
+  .invoice-sheet input[type=number]{ -moz-appearance:textfield; appearance:textfield; }
+  .invoice-sheet input[type=number]::-webkit-inner-spin-button,
+  .invoice-sheet input[type=number]::-webkit-outer-spin-button{ -webkit-appearance:none; margin:0; }
+  .invoice-payto .field-row label{ min-width:124px; }
+  .invoice-summary{ display:flex; justify-content:space-between; align-items:flex-start; gap:24px; flex-wrap:wrap; margin-top:18px; }
+  .invoice-summary .invoice-totals{ margin:0; flex:0 0 300px; }
+  .invoice-words{ flex:1; min-width:200px; padding-top:4px; }
+  .words-text{ margin:0; font-size:0.9rem; }
+  .invoice-details{ text-align:right; }
+  .invoice-details .meta-row label{ min-width:118px; }
+  .invoice-details .meta-row input{ max-width:170px; }
+  .field-row{ display:flex; align-items:center; gap:8px; font-size:0.85rem; margin-bottom:4px; }
+  .field-row label{ color:var(--ink-soft); font-weight:600; white-space:nowrap; min-width:96px; }
+  .invoice-foot{ display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap; margin-top:34px; }
+  .invoice-payto{ flex:1; min-width:220px; }
+  .invoice-sign{ min-width:220px; text-align:center; }
+  .sign-for{ margin:0; font-size:0.85rem; font-weight:600; color:var(--ink-soft); }
+  .sign-space{ height:54px; }
+  .sign-label{ margin:0; padding-top:6px; border-top:1px solid var(--ink); font-size:0.8rem; font-weight:700; }
   .totals-row{ display:flex; justify-content:space-between; align-items:center; font-size:0.9rem; padding:5px 0; }
   .totals-row input{ width:44px; text-align:right; display:inline-block; padding:0 3px; }
   .total-final{ border-top:1.5px solid var(--ink); margin-top:6px; padding-top:10px; font-weight:800; font-size:1.15rem; color:var(--pine-dark); }
@@ -442,21 +467,37 @@
   // doesn't lose it. "Export as PDF" uses the browser's print dialog, scoped
   // by a print stylesheet to show only the invoice sheet — choosing
   // "Save as PDF" there produces the exported file.
-  const INVOICE_DRAFT_KEY = 'siddhi_invoice_draft_v1';
+  const INVOICE_DRAFT_KEY = 'siddhi_invoice_draft_v2';
+  const INVOICE_LAST_NO_KEY = 'siddhi_invoice_last_no_v1';
+
+  // Sequential invoice numbers (1, 2, 3 ...), remembered per browser.
+  // The number stays editable; "Reset invoice" moves the counter on.
+  function nextInvoiceNumber() {
+    let last = 0;
+    try { last = parseInt(localStorage.getItem(INVOICE_LAST_NO_KEY), 10) || 0; } catch {}
+    return String(last + 1);
+  }
 
   function blankInvoice() {
-    const today = new Date().toISOString().slice(0, 10);
-    const suffix = Math.floor(100 + Math.random() * 900); // avoids same-day number collisions; editable
+    const d = new Date();
+    const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     return {
-      number: `INV-${today.replace(/-/g, '')}-${suffix}`,
+      number: nextInvoiceNumber(),
       date: today,
-      due: today,
+      placeOfSupply: '27-Maharashtra',
       billName: '',
-      billDetails: '',
-      notes: 'Thank you for your business. Please make payment by the due date.',
-      taxPct: 0,
+      billCity: '',
+      billContact: '',
+      billState: '27-Maharashtra',
+      planName: '',
+      startPlanDate: '',
+      renewedPlanDate: '',
+      balanceVisit: '',
+      items: [{ name: '', qty: 1, rate: 0 }],
+      received: 0,
+      paymentMode: '',
+      bankAccount: '',
       paid: false,
-      items: [{ desc: '', qty: 1, rate: 0 }],
     };
   }
 
@@ -464,7 +505,7 @@
     try {
       const raw = localStorage.getItem(INVOICE_DRAFT_KEY);
       if (!raw) return blankInvoice();
-      const parsed = JSON.parse(raw);
+      const parsed = Object.assign(blankInvoice(), JSON.parse(raw));
       if (!Array.isArray(parsed.items) || !parsed.items.length) parsed.items = blankInvoice().items;
       return parsed;
     } catch {
@@ -478,7 +519,41 @@
 
   function formatMoney(n) {
     const num = Number(n) || 0;
-    return `₹${num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const sign = num < 0 ? '-' : '';
+    return `${sign}₹${Math.abs(num).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+
+  const ONES = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve',
+    'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+  const TENS = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+  function twoDigitWords(n) {
+    return n < 20 ? ONES[n] : TENS[Math.floor(n / 10)] + (n % 10 ? ' ' + ONES[n % 10] : '');
+  }
+  function threeDigitWords(n) {
+    const hundreds = Math.floor(n / 100);
+    const rest = n % 100;
+    return (hundreds ? ONES[hundreds] + ' Hundred' + (rest ? ' ' : '') : '') + (rest ? twoDigitWords(rest) : '');
+  }
+  // Indian numbering: crore / lakh / thousand
+  function wholeNumberWords(n) {
+    if (n === 0) return 'Zero';
+    const crore = Math.floor(n / 10000000);
+    const lakh = Math.floor((n % 10000000) / 100000);
+    const thousand = Math.floor((n % 100000) / 1000);
+    const rest = n % 1000;
+    const parts = [];
+    if (crore) parts.push(threeDigitWords(crore) + ' Crore');
+    if (lakh) parts.push(twoDigitWords(lakh) + ' Lakh');
+    if (thousand) parts.push(twoDigitWords(thousand) + ' Thousand');
+    if (rest) parts.push(threeDigitWords(rest));
+    return parts.join(' ');
+  }
+  function amountInWords(amount) {
+    const totalPaise = Math.round(Math.max(0, Number(amount) || 0) * 100);
+    const rupees = Math.floor(totalPaise / 100);
+    const paise = totalPaise % 100;
+    return `${wholeNumberWords(rupees)} Rupees` + (paise ? ` and ${twoDigitWords(paise)} Paise` : '') + ' only';
   }
 
   function renderInvoiceUI(container) {
@@ -501,42 +576,71 @@
               <div>
                 <p class="invoice-company-name">SIDDHI ElderCare Services</p>
                 <p class="invoice-company-sub">Home care for seniors &amp; adults — Mumbai &amp; Virar</p>
-                <p class="invoice-company-contact">&middot; 7710 031 734</p>
+                <p class="invoice-company-contact">Phone no. : 7710 031 734</p>
               </div>
             </div>
             <div class="invoice-meta">
-              <h2>INVOICE</h2>
-              <div class="meta-row"><label for="inv_number">No.</label><input id="inv_number" data-inv="number"></div>
+              <h2>TAX INVOICE</h2>
+              <div class="meta-row"><label for="inv_number">Invoice no.</label><input id="inv_number" data-inv="number"></div>
               <div class="meta-row"><label for="inv_date">Date</label><input id="inv_date" type="date" data-inv="date"></div>
-              <div class="meta-row"><label for="inv_due">Due</label><input id="inv_due" type="date" data-inv="due"></div>
             </div>
           </div>
 
           <div class="invoice-parties">
-            <div>
+            <div class="invoice-billto">
               <p class="party-label">Bill to</p>
-              <input id="inv_billName" data-inv="billName" placeholder="Client name">
-              <textarea id="inv_billDetails" data-inv="billDetails" placeholder="Address / phone number" style="min-height:36px;"></textarea>
+              <div class="field-row"><label for="inv_billName">Name</label><input id="inv_billName" data-inv="billName" placeholder="Client name"></div>
+              <div class="field-row"><label for="inv_billCity">City</label><input id="inv_billCity" data-inv="billCity" placeholder="City / area"></div>
+              <div class="field-row"><label for="inv_billContact">Contact no.</label><input id="inv_billContact" type="tel" data-inv="billContact" placeholder="Phone number"></div>
+              <div class="field-row"><label for="inv_billState">State</label><input id="inv_billState" data-inv="billState" placeholder="e.g. 27-Maharashtra"></div>
+            </div>
+            <div class="invoice-details">
+              <p class="party-label">Invoice details</p>
+              <div class="meta-row"><label for="inv_placeOfSupply">Place of supply</label><input id="inv_placeOfSupply" data-inv="placeOfSupply"></div>
+              <div class="meta-row"><label for="inv_planName">Plan name</label><input id="inv_planName" data-inv="planName" placeholder="e.g. Siddhi care plan"></div>
+              <div class="meta-row"><label for="inv_startPlanDate">Start plan date</label><input id="inv_startPlanDate" type="date" data-inv="startPlanDate"></div>
+              <div class="meta-row"><label for="inv_renewedPlanDate">Renewed plan date</label><input id="inv_renewedPlanDate" type="date" data-inv="renewedPlanDate"></div>
+              <div class="meta-row"><label for="inv_balanceVisit">Balance visit</label><input id="inv_balanceVisit" type="number" min="0" step="1" data-inv="balanceVisit"></div>
             </div>
           </div>
 
           <table class="invoice-table">
             <thead>
-              <tr><th>Description</th><th>Qty</th><th>Rate</th><th>Amount</th><th class="no-print"></th></tr>
+              <tr><th>#</th><th>Service name</th><th>Quantity</th><th>Price / Unit</th><th>Amount</th><th class="no-print"></th></tr>
             </thead>
             <tbody id="invoiceItems"></tbody>
+            <tfoot>
+              <tr class="table-total"><td></td><td>Total</td><td id="invQtyTotal">0</td><td></td><td id="invAmountTotal">₹0.00</td><td class="no-print"></td></tr>
+            </tfoot>
           </table>
           <button type="button" class="add-row-btn no-print" id="addItemBtn">+ Add line item</button>
 
-          <div class="invoice-totals">
-            <div class="totals-row"><span>Subtotal</span><span id="invSubtotal">₹0.00</span></div>
-            <div class="totals-row"><span>Tax (<input type="number" min="0" step="0.1" id="inv_taxPct" data-inv="taxPct">%)</span><span id="invTax">₹0.00</span></div>
-            <div class="totals-row total-final"><span>Total</span><span id="invTotal">₹0.00</span></div>
+          <div class="invoice-summary">
+            <div class="invoice-words">
+              <p class="party-label">Invoice amount in words</p>
+              <p class="words-text" id="invWords">Zero Rupees only</p>
+            </div>
+            <div class="invoice-totals">
+              <div class="totals-row"><span>Sub total</span><span id="invSubtotal">₹0.00</span></div>
+              <div class="totals-row total-final"><span>Total</span><span id="invTotal">₹0.00</span></div>
+              <div class="totals-row"><span>Received</span><input class="money-input" type="number" min="0" step="0.01" id="inv_received" data-inv="received"></div>
+              <div class="totals-row"><span>Balance</span><span id="invBalance">₹0.00</span></div>
+              <div class="totals-row"><span>Payment mode</span><input class="mode-input" id="inv_paymentMode" data-inv="paymentMode" list="invPaymentModes" placeholder="e.g. Bank transfer">
+                <datalist id="invPaymentModes"><option value="Cash"><option value="Cheque"><option value="UPI"><option value="Bank transfer"><option value="International transfer"><option value="Card"></datalist>
+              </div>
+            </div>
           </div>
 
-          <div class="invoice-notes">
-            <p class="party-label">Notes</p>
-            <textarea id="inv_notes" data-inv="notes"></textarea>
+          <div class="invoice-foot">
+            <div class="invoice-payto">
+              <p class="party-label">Pay to</p>
+              <div class="field-row"><label for="inv_bankAccount">Bank account no.</label><input id="inv_bankAccount" data-inv="bankAccount" inputmode="numeric" placeholder="Account number"></div>
+            </div>
+            <div class="invoice-sign">
+              <p class="sign-for">For: SIDDHI ElderCare Services</p>
+              <div class="sign-space"></div>
+              <p class="sign-label">Authorized signatory</p>
+            </div>
           </div>
 
           <p class="invoice-footer-note">SIDDHI ElderCare Services &middot; Mumbai &amp; Virar</p>
@@ -559,20 +663,21 @@
     function renderItemRow(item, index) {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td><input data-field="desc" placeholder="Service / item description"></td>
+        <td class="row-num">${index + 1}</td>
+        <td><input data-field="name" placeholder="Service / plan name"></td>
         <td><input data-field="qty" type="number" min="0" step="1"></td>
         <td><input data-field="rate" type="number" min="0" step="0.01"></td>
         <td class="row-amount">₹0.00</td>
         <td class="no-print"><button type="button" class="row-remove-btn" title="Remove line" aria-label="Remove line">&times;</button></td>
       `;
-      tr.querySelector('[data-field="desc"]').value = item.desc;
+      tr.querySelector('[data-field="name"]').value = item.name;
       tr.querySelector('[data-field="qty"]').value = item.qty;
       tr.querySelector('[data-field="rate"]').value = item.rate;
 
       tr.querySelectorAll('input').forEach((el) => {
         el.addEventListener('input', () => {
           const field = el.dataset.field;
-          inv.items[index][field] = field === 'desc' ? el.value : Number(el.value);
+          inv.items[index][field] = field === 'name' ? el.value : Number(el.value);
           saveInvoiceDraft(inv);
           recalcInvoiceTotals(inv);
         });
@@ -595,7 +700,7 @@
     recalcInvoiceTotals(inv);
 
     document.getElementById('addItemBtn').addEventListener('click', () => {
-      inv.items.push({ desc: '', qty: 1, rate: 0 });
+      inv.items.push({ name: '', qty: 1, rate: 0 });
       saveInvoiceDraft(inv);
       renderItemsList();
       recalcInvoiceTotals(inv);
@@ -603,6 +708,8 @@
 
     document.getElementById('resetInvoiceBtn').addEventListener('click', () => {
       if (!confirm('Clear this invoice and start a new one?')) return;
+      const usedNo = parseInt(inv.number, 10);
+      if (!isNaN(usedNo)) { try { localStorage.setItem(INVOICE_LAST_NO_KEY, String(usedNo)); } catch {} }
       localStorage.removeItem(INVOICE_DRAFT_KEY);
       renderInvoiceUI(container);
     });
@@ -623,22 +730,28 @@
   }
 
   function recalcInvoiceTotals(inv) {
+    const round2 = (x) => Math.round(x * 100) / 100;
     const rows = document.querySelectorAll('#invoiceItems tr');
     let subtotal = 0;
+    let qtyTotal = 0;
     inv.items.forEach((item, i) => {
-      const amount = (Number(item.qty) || 0) * (Number(item.rate) || 0);
+      const qty = Number(item.qty) || 0;
+      const amount = round2(qty * (Number(item.rate) || 0));
       subtotal += amount;
+      qtyTotal += qty;
       const cell = rows[i] && rows[i].querySelector('.row-amount');
       if (cell) cell.textContent = formatMoney(amount);
     });
-    const taxPct = Number(inv.taxPct) || 0;
-    const tax = subtotal * (taxPct / 100);
-    const subtotalEl = document.getElementById('invSubtotal');
-    const taxEl = document.getElementById('invTax');
-    const totalEl = document.getElementById('invTotal');
-    if (subtotalEl) subtotalEl.textContent = formatMoney(subtotal);
-    if (taxEl) taxEl.textContent = formatMoney(tax);
-    if (totalEl) totalEl.textContent = formatMoney(subtotal + tax);
+    subtotal = round2(subtotal);
+    const total = subtotal;
+    const balance = round2(total - (Number(inv.received) || 0));
+    const setText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+    setText('invQtyTotal', String(qtyTotal));
+    setText('invAmountTotal', formatMoney(total));
+    setText('invSubtotal', formatMoney(subtotal));
+    setText('invTotal', formatMoney(total));
+    setText('invBalance', formatMoney(balance));
+    setText('invWords', amountInWords(total));
   }
 
   boot();
