@@ -1541,7 +1541,8 @@ img{ max-width: 100%; display: block; }
   box-shadow: 0 16px 36px -14px rgba(20,73,95,0.18);
 }
 .team-photo{
-  height: 260px;
+  /* Portrait frame: founder photos are head-and-shoulders shots (800x1000). */
+  aspect-ratio: 4 / 5;
   overflow: hidden;
   display:flex; align-items:center; justify-content:center;
   color: var(--cream);
@@ -1558,6 +1559,7 @@ img{ max-width: 100%; display: block; }
 .team-photo img{
   width: 100%; height: 100%;
   object-fit: cover;
+  object-position: center top;
   display: block;
   transform: scale(0.94);
   transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
