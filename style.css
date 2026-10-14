@@ -162,7 +162,7 @@ img{ max-width: 100%; display: block; }
   gap: 52px;
 }
 .logo{ display:flex; align-items:center; gap:10px; text-decoration:none; color: var(--cream); }
-.logo-mark{ display:block; height: 50px; width: auto; }
+.logo-mark{ display:block; height: 62px; width: auto; border-radius: 50%; }
 .logo-text{ font-family: var(--font-display); font-weight: 700; font-size: 1.3rem; line-height:1; display:flex; flex-direction:column; color: var(--cream); }
 .logo-sub{ font-family: var(--font-body); font-weight: 500; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(251,247,239,0.7); margin-top: 4px; }
 
@@ -240,7 +240,7 @@ img{ max-width: 100%; display: block; }
 
 @media (max-width: 480px){
   .header-inner{ padding-top: 14px; padding-bottom: 14px; }
-  .logo-mark{ height: 40px; }
+  .logo-mark{ height: 48px; }
   .logo-text{ font-size: 1.15rem; }
   .logo-sub{ font-size: 0.62rem; }
 }
@@ -1183,7 +1183,7 @@ img{ max-width: 100%; display: block; }
   padding-bottom: 44px;
 }
 .footer-brand-row{ display:flex; align-items:center; gap: 10px; }
-.footer-logo-mark{ height: 34px; }
+.footer-logo-mark{ height: 52px; }
 .footer-logo{ color: var(--cream); }
 .footer-logo .logo-sub{ color: rgba(251,247,239,0.6); }
 .footer-tagline{ margin: 12px 0 0; font-size: 0.88rem; color: rgba(251,247,239,0.65); max-width: 30ch; }
