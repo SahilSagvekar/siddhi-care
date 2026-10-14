@@ -73,10 +73,10 @@ Two pages are fully wired end-to-end as a working reference:
 - **`index.html`** — hero (badge, heading, lede, button label), the "Our
   Mission" section, and the 4 trust-strip stats.
 
-`plans.html`, `team.html`, and `contact.html` aren't wired yet — the admin
-page picker will show them, but there's no `content/<page>.json` for them so
-nothing will load. Extending coverage is mechanical (see below), not a new
-architecture.
+`plans.html`, `team.html`, and `contact.html` aren't wired yet, so they are
+hidden from the admin page picker (the `PAGES` list in `admin/index.html`).
+To bring one back, wire it up as described below and add it to `PAGES`.
+Extending coverage is mechanical, not a new architecture.
 
 **Deliberately left out of scope, everywhere:**
 - Nav labels and footer link labels (structural, low value to edit)
