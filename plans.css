@@ -1,0 +1,419 @@
+/* ============================================
+   Plans & Prices page — layout inspired by a
+   split-hero / plan-card / add-on / steps flow.
+   Uses the shared tokens from style.css only.
+   ============================================ */
+
+/* ---------- Hero (split: copy left, photo right) ---------- */
+.pp-hero{
+  background: var(--pine-dark);
+  color: var(--cream);
+  padding: 140px 0 80px;
+  position: relative;
+  overflow: hidden;
+}
+.pp-hero::before{
+  content: "";
+  position: absolute;
+  right: -160px; top: -160px;
+  width: 520px; height: 520px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(79,168,216,0.22), transparent 68%);
+  pointer-events: none;
+}
+.pp-hero-inner{
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 56px;
+  align-items: center;
+}
+.pp-hero h1{
+  color: var(--cream);
+  margin-bottom: 0.4em;
+  animation: heroFadeUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.15s;
+}
+.pp-hero h1 em{ color: var(--marigold); font-style: italic; }
+.pp-hero .hero-lede{ max-width: 50ch; margin-bottom: 26px; }
+
+.pp-hero-points{
+  list-style: none;
+  margin: 0 0 34px;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+  animation: heroFadeUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.4s;
+}
+.pp-hero-points li{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 1.02rem;
+  color: var(--cream);
+}
+.pp-hero-points li::before{
+  content: "";
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  background: var(--marigold);
+  box-shadow: 0 0 0 5px rgba(220,226,142,0.18);
+  flex-shrink: 0;
+}
+.pp-hero-actions{
+  display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+  animation: heroFadeUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.5s;
+}
+
+.pp-hero-photo{
+  position: relative;
+  border-radius: 22px;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  box-shadow: 0 30px 60px -30px rgba(0,0,0,0.55);
+  animation: heroFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.3s;
+}
+.pp-hero-photo img{ width: 100%; height: 100%; object-fit: cover; object-position: 70% center; }
+.pp-hero-photo-tag{
+  position: absolute;
+  left: 18px; bottom: 18px;
+  display: inline-flex; align-items: center; gap: 9px;
+  background: rgba(251,247,239,0.95);
+  color: var(--pine-dark);
+  font-size: 0.82rem; font-weight: 700;
+  padding: 9px 16px;
+  border-radius: 999px;
+  box-shadow: 0 8px 20px -10px rgba(0,0,0,0.4);
+}
+
+@media (max-width: 900px){
+  .pp-hero{ padding: 120px 0 60px; }
+  .pp-hero-inner{ grid-template-columns: 1fr; gap: 40px; }
+  .pp-hero-photo{ aspect-ratio: 16 / 11; }
+}
+@media (max-width: 480px){
+  .pp-hero-actions{ flex-direction: column; align-items: stretch; gap: 14px; }
+  .pp-hero-actions .btn{ justify-content: center; }
+  .pp-hero-actions .hero-phone-link{ justify-content: center; }
+}
+
+/* ---------- Shared section head ---------- */
+.pp-head{ text-align: center; max-width: 660px; margin: 0 auto; }
+.pp-head h2{ max-width: none; margin: 0 0 0.45em; }
+.pp-head p{ margin: 0 auto; }
+
+/* ---------- Plan cards ---------- */
+.pp-pricing{ padding: 88px 0; }
+.pp-plans{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 60px;
+  align-items: stretch;
+}
+.pp-plan.price-card{ padding: 34px 26px 28px; text-align: center; }
+.pp-plan-name{ margin: 0; }
+.pp-plan-name small{
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.74rem; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 4px;
+}
+.pp-plan-name span{ display: block; font-size: 1.4rem; color: var(--pine-dark); }
+.pp-plan-for{
+  margin: 16px 0 20px;
+  padding: 9px 14px;
+  border-radius: 10px;
+  background: var(--marigold);
+  color: var(--pine-dark);
+  font-size: 0.82rem; font-weight: 600;
+  line-height: 1.4;
+}
+.pp-plan-featured .pp-plan-for{ background: var(--pine-dark); color: var(--cream); }
+
+.pp-plan .price-amount{ font-size: 2.1rem; margin-bottom: 2px; }
+.pp-plan-permonth{
+  display: block;
+  font-size: 0.8rem; color: var(--ink-soft);
+  margin: 0 0 4px;
+}
+.pp-plan .price-note{
+  display: inline-block;
+  background: var(--sand);
+  color: var(--pine-dark);
+  font-weight: 700;
+  font-size: 0.74rem;
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin: 8px 0 16px;
+}
+.pp-plan .price-desc{ min-height: 0; margin-bottom: 22px; }
+.pp-plan-features-title{
+  text-align: left;
+  font-size: 0.74rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--pine-dark);
+  margin: 0 0 6px;
+}
+.pp-plan .price-features{ text-align: left; margin-bottom: 26px; }
+.pp-plan .price-features li{
+  padding: 10px 0;
+  margin: 0;
+  border-bottom: 1px dashed var(--line);
+}
+.pp-plan .price-features li:last-child{ border-bottom: 0; }
+
+.pp-pricing-foot{ text-align: center; margin-top: 40px; }
+.pp-pricing-foot p{ font-size: 0.86rem; margin-bottom: 18px; }
+
+@media (max-width: 960px){
+  .pp-plans{ grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .pp-plan-featured{ order: -1; grid-column: span 2; max-width: 460px; width: 100%; justify-self: center; }
+}
+@media (max-width: 640px){
+  .pp-plans{ grid-template-columns: 1fr; }
+  .pp-plan-featured{ grid-column: span 1; max-width: none; }
+}
+
+/* ---------- Condition-specific add-ons ---------- */
+.pp-addons{ padding: 88px 0; background: var(--sand); }
+.pp-addons-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  margin-top: 52px;
+}
+.pp-addon.addon-card{
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-lg);
+}
+.pp-addon-head{
+  display: flex; align-items: center; gap: 12px;
+  background: var(--pine-dark);
+  color: var(--cream);
+  padding: 16px 20px;
+}
+.pp-addon-head .addon-icon{
+  margin: 0;
+  width: 38px; height: 38px;
+  background: rgba(251,247,239,0.14);
+  flex-shrink: 0;
+}
+.pp-addon.addon-card:hover .addon-icon{ background: var(--marigold); color: var(--pine-dark); }
+.pp-addon-head h3{ color: var(--cream); font-size: 1rem; margin: 0; line-height: 1.3; }
+.pp-addon-body{ padding: 22px 22px 24px; display: flex; flex-direction: column; flex: 1; }
+.pp-addon-quote{
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--pine-dark) !important;
+  font-size: 0.98rem !important;
+  line-height: 1.45;
+  border-left: 3px solid var(--marigold-dark);
+  padding-left: 12px;
+  margin: 0 0 16px !important;
+}
+.pp-addon-body ul{
+  margin: 0 0 22px;
+  padding-left: 18px;
+  flex: 1;
+}
+.pp-addon-body li{ font-size: 0.87rem; color: var(--ink-soft); margin-bottom: 8px; }
+.pp-addon-body li::marker{ color: var(--clayrose); }
+.pp-addon-body .btn{ align-self: flex-start; padding: 10px 20px; font-size: 0.88rem; }
+
+@media (max-width: 960px){ .pp-addons-grid{ grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px){ .pp-addons-grid{ grid-template-columns: 1fr; } }
+
+/* ---------- "Choose the best plan" band ---------- */
+.pp-band{ padding: 88px 0 0; }
+.pp-band-inner{
+  position: relative;
+  background: var(--pine-dark);
+  border-radius: var(--radius-lg);
+  padding: 44px 48px;
+  min-height: 260px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+  align-items: center;
+  overflow: hidden;
+}
+.pp-band-copy{ position: relative; z-index: 1; }
+.pp-band-copy h2{ color: var(--cream); margin-bottom: 0.3em; }
+.pp-band-copy p{ color: rgba(251,247,239,0.85); margin-bottom: 24px; }
+.pp-band-actions{ display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+.pp-band-person{
+  position: relative;
+  width: 230px; height: 230px;
+  flex-shrink: 0;
+}
+.pp-band-person::before{
+  content: "";
+  position: absolute; inset: -14px;
+  border-radius: 46% 54% 52% 48% / 55% 45% 55% 45%;
+  background: var(--marigold);
+}
+.pp-band-person img{
+  position: relative;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center 15%;
+  border-radius: 50%;
+  border: 4px solid var(--cream);
+}
+.pp-band-person-name{
+  position: absolute;
+  left: 50%; bottom: -12px;
+  transform: translateX(-50%);
+  background: var(--cream);
+  color: var(--pine-dark);
+  font-size: 0.78rem; font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+  box-shadow: 0 8px 18px -8px rgba(0,0,0,0.35);
+}
+@media (max-width: 760px){
+  .pp-band{ padding-top: 60px; }
+  .pp-band-inner{ grid-template-columns: 1fr; padding: 32px 24px 44px; text-align: left; }
+  .pp-band-person{ width: 170px; height: 170px; order: -1; margin: 10px 0 8px 14px; }
+}
+@media (max-width: 480px){
+  .pp-band-actions{ flex-direction: column; align-items: stretch; gap: 14px; }
+  .pp-band-actions .btn{ justify-content: center; }
+  .pp-band-actions .cta-phone-link{ justify-content: center; }
+}
+
+/* ---------- Activate care: steps with photo pills ---------- */
+.pp-steps-section{ padding: 88px 0; }
+.pp-steps{
+  list-style: none;
+  margin: 52px auto 0;
+  padding: 0;
+  max-width: 900px;
+  display: grid;
+  gap: 18px;
+}
+.pp-step{
+  display: grid;
+  grid-template-columns: 330px 1fr;
+  gap: 40px;
+  align-items: center;
+}
+.pp-step-pill{
+  position: relative;
+  display: flex; align-items: center;
+  height: 86px;
+  padding-left: 104px;
+  padding-right: 20px;
+  background: rgba(46,134,171,0.12);
+  border-radius: 999px 16px 16px 999px;
+  font-weight: 700;
+  color: var(--pine-dark);
+  font-size: 0.95rem;
+  transition: background 0.2s ease, transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.pp-step:hover .pp-step-pill{ background: rgba(46,134,171,0.2); transform: translateX(4px); }
+.pp-step-pill img{
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 92px; height: 92px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--cream);
+  box-shadow: 0 8px 18px -10px rgba(20,73,95,0.45);
+}
+.pp-step-pill svg{ color: var(--pine); margin-left: 6px; flex-shrink: 0; }
+.pp-step:last-child .pp-step-pill{ background: var(--marigold); }
+.pp-step-copy small{
+  display: block;
+  font-size: 0.74rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--clayrose);
+  margin-bottom: 4px;
+}
+.pp-step-copy h3{ font-family: var(--font-body); font-size: 1.02rem; font-weight: 700; margin: 0 0 4px; }
+.pp-step-copy p{ font-size: 0.9rem; margin: 0; }
+.pp-steps-cta{ text-align: center; margin-top: 44px; }
+
+@media (max-width: 760px){
+  .pp-step{ grid-template-columns: 1fr; gap: 12px; }
+  .pp-step + .pp-step{ margin-top: 14px; }
+  .pp-step-copy{ padding-left: 8px; }
+}
+
+/* ---------- Testimonials (reuses .testimonial-card) ---------- */
+.pp-testimonials{ padding: 88px 0; background: var(--sand); }
+.pp-testimonials .testimonial-card{ display: flex; flex-direction: column; }
+.pp-testimonial-where{
+  font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--clayrose);
+  margin: 0 0 10px;
+}
+.pp-testimonials .testimonial-quote{ flex: 1; }
+
+/* ---------- FAQ spacing (reuses .faq-item) ---------- */
+.pp-faq{ padding: 88px 0; }
+
+/* ---------- City availability form over photo ---------- */
+.pp-contact{ padding: 0 0 88px; }
+.pp-contact-media{
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  padding: 56px 40px;
+  background:
+    linear-gradient(90deg, rgba(20,73,95,0.82) 0%, rgba(20,73,95,0.55) 45%, rgba(20,73,95,0.25) 100%),
+    url('images/hero-photo-2.jpeg') center/cover no-repeat;
+  display: grid;
+  grid-template-columns: 1fr minmax(320px, 440px);
+  gap: 40px;
+  align-items: center;
+}
+.pp-contact-copy h2{ color: var(--cream); margin-bottom: 0.35em; }
+.pp-contact-copy p{ color: rgba(251,247,239,0.88); max-width: 42ch; }
+.pp-contact-areas{ display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+.pp-contact-areas span{
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(251,247,239,0.14);
+  border: 1px solid rgba(251,247,239,0.3);
+  color: var(--cream);
+  font-size: 0.82rem; font-weight: 600;
+}
+.pp-form-card{
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(6px);
+  border-radius: var(--radius-lg);
+  padding: 30px 28px;
+  box-shadow: 0 30px 60px -28px rgba(0,0,0,0.5);
+}
+.pp-form-card h3{ font-size: 1.35rem; margin-bottom: 0.2em; text-align: center; }
+.pp-form-card .pp-form-lede{ font-size: 0.88rem; text-align: center; margin-bottom: 22px; }
+.pp-form-card .form-row{ margin-bottom: 14px; }
+.pp-form-card .btn{ width: 100%; justify-content: center; }
+.pp-form-success{ display: none; text-align: center; padding: 20px 0; }
+.pp-form-success.is-visible{ display: block; }
+.pp-form-success svg{ color: var(--pine); margin: 0 auto 12px; }
+.pp-form-error{ display: none; font-size: 0.82rem; color: var(--clayrose); text-align: center; margin: 12px 0 0; }
+.pp-form-error.is-visible{ display: block; }
+.pp-inline-form.is-hidden{ display: none; }
+
+@media (max-width: 900px){
+  .pp-contact-media{ grid-template-columns: 1fr; padding: 36px 24px; }
+}
+@media (max-width: 480px){
+  .pp-contact-media{ padding: 28px 16px; }
+  .pp-form-card{ padding: 24px 18px; }
+}
