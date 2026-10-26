@@ -1,0 +1,1429 @@
+From 4df416e832183d32043202e4f5777e4197628027 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Mon, 26 Oct 2026 17:15:53 +0000
+Subject: [PATCH] Rebuild Plans & Pricing page and enable it in every navbar
+
+- New plans.html layout (split hero, plan cards, add-ons, steps, testimonials, FAQ, inline call-back form) using existing design tokens
+- New plans.css for page-specific styles
+- Fix CTA phone links that dialled the wrong number
+- Uncomment Plans & Pricing link in header and footer nav on all pages
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01F6M584kkfEz2iKthjEueMg
+---
+ ...e-best-home-care-services-for-parents.html |   4 +-
+ consistent-care-quality-of-life-seniors.html  |   4 +-
+ contact.html                                  |   4 +-
+ home-health-care-independent-living.html      |   4 +-
+ index.html                                    |   4 +-
+ plans.css                                     | 419 +++++++++++++
+ plans.html                                    | 582 ++++++++++++------
+ privacy.html                                  |   4 +-
+ refund.html                                   |   4 +-
+ resources.html                                |   4 +-
+ services.html                                 |   4 +-
+ team.html                                     |   4 +-
+ terms.html                                    |   4 +-
+ 13 files changed, 850 insertions(+), 195 deletions(-)
+ create mode 100644 plans.css
+
+diff --git a/choose-best-home-care-services-for-parents.html b/choose-best-home-care-services-for-parents.html
+index 2f94642..9803098 100644
+--- a/choose-best-home-care-services-for-parents.html
++++ b/choose-best-home-care-services-for-parents.html
+@@ -24,7 +24,7 @@
+     <nav class="site-nav" id="siteNav" aria-label="Primary">
+       <a href="index.html#top">Home</a>
+       <a href="services.html">Services</a>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <!-- <a href="index.html#how-it-works">How it works</a> -->
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact</a>
+@@ -191,7 +191,7 @@
+ 
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact Us</a>
+       <a href="resources.html">Blog &amp; Guides</a>
+diff --git a/consistent-care-quality-of-life-seniors.html b/consistent-care-quality-of-life-seniors.html
+index d685966..ef0b5cb 100644
+--- a/consistent-care-quality-of-life-seniors.html
++++ b/consistent-care-quality-of-life-seniors.html
+@@ -24,7 +24,7 @@
+     <nav class="site-nav" id="siteNav" aria-label="Primary">
+       <a href="index.html#top">Home</a>
+       <a href="services.html">Services</a>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <!-- <a href="index.html#how-it-works">How it works</a> -->
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact</a>
+@@ -182,7 +182,7 @@
+ 
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact Us</a>
+       <a href="resources.html">Blog &amp; Guides</a>
+diff --git a/contact.html b/contact.html
+index 76c7ded..0baa52b 100644
+--- a/contact.html
++++ b/contact.html
+@@ -25,7 +25,7 @@
+     <nav class="site-nav" id="siteNav" aria-label="Primary">
+       <a href="index.html#top">Home</a>
+       <a href="services.html">Services</a>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html" class="is-active">Contact</a>
+     </nav>
+@@ -210,7 +210,7 @@
+ 
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact Us</a>
+       <a href="index.html#resources">Blog &amp; Guides</a>
+diff --git a/home-health-care-independent-living.html b/home-health-care-independent-living.html
+index e7a054a..1efe592 100644
+--- a/home-health-care-independent-living.html
++++ b/home-health-care-independent-living.html
+@@ -24,7 +24,7 @@
+     <nav class="site-nav" id="siteNav" aria-label="Primary">
+       <a href="index.html#top">Home</a>
+       <a href="services.html">Services</a>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <!-- <a href="index.html#how-it-works">How it works</a> -->
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact</a>
+@@ -184,7 +184,7 @@
+ 
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact Us</a>
+       <a href="resources.html">Blog &amp; Guides</a>
+diff --git a/index.html b/index.html
+index 8c47ffd..f621c2c 100644
+--- a/index.html
++++ b/index.html
+@@ -23,7 +23,7 @@
+     <nav class="site-nav" id="siteNav" aria-label="Primary">
+       <a href="#top">Home</a>
+       <a href="services.html">Services</a>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact</a>
+     </nav>
+@@ -596,7 +596,7 @@
+ 
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <a href="team.html">Our Team</a>
+       <a href="#contact">FAQ</a>
+       <a href="resources.html">Blog &amp; Guides</a>
+diff --git a/plans.css b/plans.css
+new file mode 100644
+index 0000000..2c450aa
+--- /dev/null
++++ b/plans.css
+@@ -0,0 +1,419 @@
++/* ============================================
++   Plans & Prices page — layout inspired by a
++   split-hero / plan-card / add-on / steps flow.
++   Uses the shared tokens from style.css only.
++   ============================================ */
++
++/* ---------- Hero (split: copy left, photo right) ---------- */
++.pp-hero{
++  background: var(--pine-dark);
++  color: var(--cream);
++  padding: 140px 0 80px;
++  position: relative;
++  overflow: hidden;
++}
++.pp-hero::before{
++  content: "";
++  position: absolute;
++  right: -160px; top: -160px;
++  width: 520px; height: 520px;
++  border-radius: 50%;
++  background: radial-gradient(circle, rgba(79,168,216,0.22), transparent 68%);
++  pointer-events: none;
++}
++.pp-hero-inner{
++  position: relative;
++  display: grid;
++  grid-template-columns: 1.05fr 0.95fr;
++  gap: 56px;
++  align-items: center;
++}
++.pp-hero h1{
++  color: var(--cream);
++  margin-bottom: 0.4em;
++  animation: heroFadeUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
++  animation-delay: 0.15s;
++}
++.pp-hero h1 em{ color: var(--marigold); font-style: italic; }
++.pp-hero .hero-lede{ max-width: 50ch; margin-bottom: 26px; }
++
++.pp-hero-points{
++  list-style: none;
++  margin: 0 0 34px;
++  padding: 0;
++  display: grid;
++  gap: 14px;
++  animation: heroFadeUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
++  animation-delay: 0.4s;
++}
++.pp-hero-points li{
++  display: flex;
++  align-items: center;
++  gap: 12px;
++  font-weight: 600;
++  font-size: 1.02rem;
++  color: var(--cream);
++}
++.pp-hero-points li::before{
++  content: "";
++  width: 11px; height: 11px;
++  border-radius: 50%;
++  background: var(--marigold);
++  box-shadow: 0 0 0 5px rgba(220,226,142,0.18);
++  flex-shrink: 0;
++}
++.pp-hero-actions{
++  display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
++  animation: heroFadeUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
++  animation-delay: 0.5s;
++}
++
++.pp-hero-photo{
++  position: relative;
++  border-radius: 22px;
++  overflow: hidden;
++  aspect-ratio: 1 / 1;
++  box-shadow: 0 30px 60px -30px rgba(0,0,0,0.55);
++  animation: heroFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
++  animation-delay: 0.3s;
++}
++.pp-hero-photo img{ width: 100%; height: 100%; object-fit: cover; object-position: 70% center; }
++.pp-hero-photo-tag{
++  position: absolute;
++  left: 18px; bottom: 18px;
++  display: inline-flex; align-items: center; gap: 9px;
++  background: rgba(251,247,239,0.95);
++  color: var(--pine-dark);
++  font-size: 0.82rem; font-weight: 700;
++  padding: 9px 16px;
++  border-radius: 999px;
++  box-shadow: 0 8px 20px -10px rgba(0,0,0,0.4);
++}
++
++@media (max-width: 900px){
++  .pp-hero{ padding: 120px 0 60px; }
++  .pp-hero-inner{ grid-template-columns: 1fr; gap: 40px; }
++  .pp-hero-photo{ aspect-ratio: 16 / 11; }
++}
++@media (max-width: 480px){
++  .pp-hero-actions{ flex-direction: column; align-items: stretch; gap: 14px; }
++  .pp-hero-actions .btn{ justify-content: center; }
++  .pp-hero-actions .hero-phone-link{ justify-content: center; }
++}
++
++/* ---------- Shared section head ---------- */
++.pp-head{ text-align: center; max-width: 660px; margin: 0 auto; }
++.pp-head h2{ max-width: none; margin: 0 0 0.45em; }
++.pp-head p{ margin: 0 auto; }
++
++/* ---------- Plan cards ---------- */
++.pp-pricing{ padding: 88px 0; }
++.pp-plans{
++  display: grid;
++  grid-template-columns: repeat(3, 1fr);
++  gap: 24px;
++  margin-top: 60px;
++  align-items: stretch;
++}
++.pp-plan.price-card{ padding: 34px 26px 28px; text-align: center; }
++.pp-plan-name{ margin: 0; }
++.pp-plan-name small{
++  display: block;
++  font-family: var(--font-body);
++  font-size: 0.74rem; font-weight: 700;
++  letter-spacing: 0.14em; text-transform: uppercase;
++  color: var(--ink-soft);
++  margin-bottom: 4px;
++}
++.pp-plan-name span{ display: block; font-size: 1.4rem; color: var(--pine-dark); }
++.pp-plan-for{
++  margin: 16px 0 20px;
++  padding: 9px 14px;
++  border-radius: 10px;
++  background: var(--marigold);
++  color: var(--pine-dark);
++  font-size: 0.82rem; font-weight: 600;
++  line-height: 1.4;
++}
++.pp-plan-featured .pp-plan-for{ background: var(--pine-dark); color: var(--cream); }
++
++.pp-plan .price-amount{ font-size: 2.1rem; margin-bottom: 2px; }
++.pp-plan-permonth{
++  display: block;
++  font-size: 0.8rem; color: var(--ink-soft);
++  margin: 0 0 4px;
++}
++.pp-plan .price-note{
++  display: inline-block;
++  background: var(--sand);
++  color: var(--pine-dark);
++  font-weight: 700;
++  font-size: 0.74rem;
++  padding: 4px 12px;
++  border-radius: 999px;
++  margin: 8px 0 16px;
++}
++.pp-plan .price-desc{ min-height: 0; margin-bottom: 22px; }
++.pp-plan-features-title{
++  text-align: left;
++  font-size: 0.74rem; font-weight: 700;
++  letter-spacing: 0.12em; text-transform: uppercase;
++  color: var(--pine-dark);
++  margin: 0 0 6px;
++}
++.pp-plan .price-features{ text-align: left; margin-bottom: 26px; }
++.pp-plan .price-features li{
++  padding: 10px 0;
++  margin: 0;
++  border-bottom: 1px dashed var(--line);
++}
++.pp-plan .price-features li:last-child{ border-bottom: 0; }
++
++.pp-pricing-foot{ text-align: center; margin-top: 40px; }
++.pp-pricing-foot p{ font-size: 0.86rem; margin-bottom: 18px; }
++
++@media (max-width: 960px){
++  .pp-plans{ grid-template-columns: repeat(2, 1fr); gap: 20px; }
++  .pp-plan-featured{ order: -1; grid-column: span 2; max-width: 460px; width: 100%; justify-self: center; }
++}
++@media (max-width: 640px){
++  .pp-plans{ grid-template-columns: 1fr; }
++  .pp-plan-featured{ grid-column: span 1; max-width: none; }
++}
++
++/* ---------- Condition-specific add-ons ---------- */
++.pp-addons{ padding: 88px 0; background: var(--sand); }
++.pp-addons-grid{
++  display: grid;
++  grid-template-columns: repeat(3, 1fr);
++  gap: 22px;
++  margin-top: 52px;
++}
++.pp-addon.addon-card{
++  padding: 0;
++  overflow: hidden;
++  display: flex;
++  flex-direction: column;
++  border-radius: var(--radius-lg);
++}
++.pp-addon-head{
++  display: flex; align-items: center; gap: 12px;
++  background: var(--pine-dark);
++  color: var(--cream);
++  padding: 16px 20px;
++}
++.pp-addon-head .addon-icon{
++  margin: 0;
++  width: 38px; height: 38px;
++  background: rgba(251,247,239,0.14);
++  flex-shrink: 0;
++}
++.pp-addon.addon-card:hover .addon-icon{ background: var(--marigold); color: var(--pine-dark); }
++.pp-addon-head h3{ color: var(--cream); font-size: 1rem; margin: 0; line-height: 1.3; }
++.pp-addon-body{ padding: 22px 22px 24px; display: flex; flex-direction: column; flex: 1; }
++.pp-addon-quote{
++  font-family: var(--font-display);
++  font-style: italic;
++  font-weight: 500;
++  color: var(--pine-dark) !important;
++  font-size: 0.98rem !important;
++  line-height: 1.45;
++  border-left: 3px solid var(--marigold-dark);
++  padding-left: 12px;
++  margin: 0 0 16px !important;
++}
++.pp-addon-body ul{
++  margin: 0 0 22px;
++  padding-left: 18px;
++  flex: 1;
++}
++.pp-addon-body li{ font-size: 0.87rem; color: var(--ink-soft); margin-bottom: 8px; }
++.pp-addon-body li::marker{ color: var(--clayrose); }
++.pp-addon-body .btn{ align-self: flex-start; padding: 10px 20px; font-size: 0.88rem; }
++
++@media (max-width: 960px){ .pp-addons-grid{ grid-template-columns: repeat(2, 1fr); } }
++@media (max-width: 640px){ .pp-addons-grid{ grid-template-columns: 1fr; } }
++
++/* ---------- "Choose the best plan" band ---------- */
++.pp-band{ padding: 88px 0 0; }
++.pp-band-inner{
++  position: relative;
++  background: var(--pine-dark);
++  border-radius: var(--radius-lg);
++  padding: 44px 48px;
++  min-height: 260px;
++  display: grid;
++  grid-template-columns: 1fr auto;
++  gap: 32px;
++  align-items: center;
++  overflow: hidden;
++}
++.pp-band-copy{ position: relative; z-index: 1; }
++.pp-band-copy h2{ color: var(--cream); margin-bottom: 0.3em; }
++.pp-band-copy p{ color: rgba(251,247,239,0.85); margin-bottom: 24px; }
++.pp-band-actions{ display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
++.pp-band-person{
++  position: relative;
++  width: 230px; height: 230px;
++  flex-shrink: 0;
++}
++.pp-band-person::before{
++  content: "";
++  position: absolute; inset: -14px;
++  border-radius: 46% 54% 52% 48% / 55% 45% 55% 45%;
++  background: var(--marigold);
++}
++.pp-band-person img{
++  position: relative;
++  width: 100%; height: 100%;
++  object-fit: cover; object-position: center 15%;
++  border-radius: 50%;
++  border: 4px solid var(--cream);
++}
++.pp-band-person-name{
++  position: absolute;
++  left: 50%; bottom: -12px;
++  transform: translateX(-50%);
++  background: var(--cream);
++  color: var(--pine-dark);
++  font-size: 0.78rem; font-weight: 700;
++  padding: 6px 14px;
++  border-radius: 999px;
++  white-space: nowrap;
++  box-shadow: 0 8px 18px -8px rgba(0,0,0,0.35);
++}
++@media (max-width: 760px){
++  .pp-band{ padding-top: 60px; }
++  .pp-band-inner{ grid-template-columns: 1fr; padding: 32px 24px 44px; text-align: left; }
++  .pp-band-person{ width: 170px; height: 170px; order: -1; margin: 10px 0 8px 14px; }
++}
++@media (max-width: 480px){
++  .pp-band-actions{ flex-direction: column; align-items: stretch; gap: 14px; }
++  .pp-band-actions .btn{ justify-content: center; }
++  .pp-band-actions .cta-phone-link{ justify-content: center; }
++}
++
++/* ---------- Activate care: steps with photo pills ---------- */
++.pp-steps-section{ padding: 88px 0; }
++.pp-steps{
++  list-style: none;
++  margin: 52px auto 0;
++  padding: 0;
++  max-width: 900px;
++  display: grid;
++  gap: 18px;
++}
++.pp-step{
++  display: grid;
++  grid-template-columns: 330px 1fr;
++  gap: 40px;
++  align-items: center;
++}
++.pp-step-pill{
++  position: relative;
++  display: flex; align-items: center;
++  height: 86px;
++  padding-left: 104px;
++  padding-right: 20px;
++  background: rgba(46,134,171,0.12);
++  border-radius: 999px 16px 16px 999px;
++  font-weight: 700;
++  color: var(--pine-dark);
++  font-size: 0.95rem;
++  transition: background 0.2s ease, transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
++}
++.pp-step:hover .pp-step-pill{ background: rgba(46,134,171,0.2); transform: translateX(4px); }
++.pp-step-pill img{
++  position: absolute;
++  left: 0; top: 50%;
++  transform: translateY(-50%);
++  width: 92px; height: 92px;
++  border-radius: 50%;
++  object-fit: cover;
++  border: 4px solid var(--cream);
++  box-shadow: 0 8px 18px -10px rgba(20,73,95,0.45);
++}
++.pp-step-pill svg{ color: var(--pine); margin-left: 6px; flex-shrink: 0; }
++.pp-step:last-child .pp-step-pill{ background: var(--marigold); }
++.pp-step-copy small{
++  display: block;
++  font-size: 0.74rem; font-weight: 700;
++  letter-spacing: 0.12em; text-transform: uppercase;
++  color: var(--clayrose);
++  margin-bottom: 4px;
++}
++.pp-step-copy h3{ font-family: var(--font-body); font-size: 1.02rem; font-weight: 700; margin: 0 0 4px; }
++.pp-step-copy p{ font-size: 0.9rem; margin: 0; }
++.pp-steps-cta{ text-align: center; margin-top: 44px; }
++
++@media (max-width: 760px){
++  .pp-step{ grid-template-columns: 1fr; gap: 12px; }
++  .pp-step + .pp-step{ margin-top: 14px; }
++  .pp-step-copy{ padding-left: 8px; }
++}
++
++/* ---------- Testimonials (reuses .testimonial-card) ---------- */
++.pp-testimonials{ padding: 88px 0; background: var(--sand); }
++.pp-testimonials .testimonial-card{ display: flex; flex-direction: column; }
++.pp-testimonial-where{
++  font-size: 0.72rem; font-weight: 700;
++  letter-spacing: 0.12em; text-transform: uppercase;
++  color: var(--clayrose);
++  margin: 0 0 10px;
++}
++.pp-testimonials .testimonial-quote{ flex: 1; }
++
++/* ---------- FAQ spacing (reuses .faq-item) ---------- */
++.pp-faq{ padding: 88px 0; }
++
++/* ---------- City availability form over photo ---------- */
++.pp-contact{ padding: 0 0 88px; }
++.pp-contact-media{
++  position: relative;
++  border-radius: var(--radius-lg);
++  overflow: hidden;
++  padding: 56px 40px;
++  background:
++    linear-gradient(90deg, rgba(20,73,95,0.82) 0%, rgba(20,73,95,0.55) 45%, rgba(20,73,95,0.25) 100%),
++    url('images/hero-photo-2.jpeg') center/cover no-repeat;
++  display: grid;
++  grid-template-columns: 1fr minmax(320px, 440px);
++  gap: 40px;
++  align-items: center;
++}
++.pp-contact-copy h2{ color: var(--cream); margin-bottom: 0.35em; }
++.pp-contact-copy p{ color: rgba(251,247,239,0.88); max-width: 42ch; }
++.pp-contact-areas{ display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
++.pp-contact-areas span{
++  padding: 6px 14px;
++  border-radius: 999px;
++  background: rgba(251,247,239,0.14);
++  border: 1px solid rgba(251,247,239,0.3);
++  color: var(--cream);
++  font-size: 0.82rem; font-weight: 600;
++}
++.pp-form-card{
++  background: rgba(255,255,255,0.96);
++  backdrop-filter: blur(6px);
++  border-radius: var(--radius-lg);
++  padding: 30px 28px;
++  box-shadow: 0 30px 60px -28px rgba(0,0,0,0.5);
++}
++.pp-form-card h3{ font-size: 1.35rem; margin-bottom: 0.2em; text-align: center; }
++.pp-form-card .pp-form-lede{ font-size: 0.88rem; text-align: center; margin-bottom: 22px; }
++.pp-form-card .form-row{ margin-bottom: 14px; }
++.pp-form-card .btn{ width: 100%; justify-content: center; }
++.pp-form-success{ display: none; text-align: center; padding: 20px 0; }
++.pp-form-success.is-visible{ display: block; }
++.pp-form-success svg{ color: var(--pine); margin: 0 auto 12px; }
++.pp-form-error{ display: none; font-size: 0.82rem; color: var(--clayrose); text-align: center; margin: 12px 0 0; }
++.pp-form-error.is-visible{ display: block; }
++.pp-inline-form.is-hidden{ display: none; }
++
++@media (max-width: 900px){
++  .pp-contact-media{ grid-template-columns: 1fr; padding: 36px 24px; }
++}
++@media (max-width: 480px){
++  .pp-contact-media{ padding: 28px 16px; }
++  .pp-form-card{ padding: 24px 18px; }
++}
+diff --git a/plans.html b/plans.html
+index bc66617..c2873a5 100644
+--- a/plans.html
++++ b/plans.html
+@@ -3,13 +3,14 @@
+ <head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+-<title>Plans &amp; Prices — SIDDHI ElderCare Services</title>
++<title>Plans &amp; Pricing — SIDDHI ElderCare Services</title>
+ <link rel="icon" type="image/png" href="logo-mark.png">
+-<meta name="description" content="Simple, transparent care plans for your parents — from companion visits to full medical coordination. One plan covers both parents.">
++<meta name="description" content="Simple, transparent care plans for your parents — from regular care visits to closer ongoing support. One plan covers both parents.">
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="style.css">
++<link rel="stylesheet" href="plans.css">
+ </head>
+ <body>
+ 
+@@ -25,7 +26,7 @@
+     <nav class="site-nav" id="siteNav" aria-label="Primary">
+       <a href="index.html#top">Home</a>
+       <a href="services.html">Services</a>
+-      <a href="plans.html" class="is-active">Plans &amp; Prices</a>
++      <a href="plans.html" class="is-active">Plans &amp; Pricing</a>
+       <!-- <a href="index.html#how-it-works">How it works</a> -->
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact</a>
+@@ -41,76 +42,107 @@
+ 
+ <main id="main">
+ 
+-  <!-- PAGE HERO -->
+-  <section class="page-hero" id="top">
+-    <div class="wrap page-hero-inner">
+-      <p class="hero-badge">
+-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12c-2-2-3.5-3.2-3.5-4.8a2.3 2.3 0 0 1 4.2-1.4 2.3 2.3 0 0 1 4.2 1.4c0 1.6-1.5 2.8-3.5 4.8L12 13.2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11c1.2 2 3.5 3 6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 11c-1.2 2-3.5 3-6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5c0 2.5 3.5 4.5 9 4.5s9-2 9-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+-        Simple Pricing · No Lock-In
+-      </p>
+-      <h1>Care Plans Built Around <em>Your Parents</em></h1>
+-      <p class="hero-lede">Whether they need a friendly regular visit or full medical coordination, there's a plan that fits — and one plan covers both parents, not two separate subscriptions.</p>
+-    </div>
+-  </section>
++  <!-- ===== HERO — split: copy left, photo right ===== -->
++  <section class="pp-hero" id="top">
++    <div class="wrap pp-hero-inner">
++      <div>
++        <p class="hero-badge">
++          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12c-2-2-3.5-3.2-3.5-4.8a2.3 2.3 0 0 1 4.2-1.4 2.3 2.3 0 0 1 4.2 1.4c0 1.6-1.5 2.8-3.5 4.8L12 13.2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11c1.2 2 3.5 3 6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 11c-1.2 2-3.5 3-6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5c0 2.5 3.5 4.5 9 4.5s9-2 9-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
++          Simple Pricing · No Lock-In
++        </p>
++        <h1>Care Plans Built Around <em>Your Parents</em></h1>
++        <p class="hero-lede">Whether they need a friendly regular visit or closer ongoing support, there's a plan that fits — and one plan covers both parents, not two separate subscriptions.</p>
++        <ul class="pp-hero-points">
++          <li>One plan covers both parents</li>
++          <li>A dedicated care coordinator for your family</li>
++          <li>Family WhatsApp updates, wherever you live</li>
++          <li>No lock-in — switch or cancel anytime</li>
++        </ul>
++        <div class="pp-hero-actions">
++          <button type="button" class="btn btn-primary btn-large js-open-consult">Request A Call Back To Discuss Plans
++            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
++          </button>
++          <a class="hero-phone-link" href="#plans">See the plans ↓</a>
++        </div>
++      </div>
+ 
+-  <!-- PRICING -->
+-  <section class="pricing" id="pricing">
+-    <div class="wrap pricing-head">
+-      <p class="section-badge">
+-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12c-2-2-3.5-3.2-3.5-4.8a2.3 2.3 0 0 1 4.2-1.4 2.3 2.3 0 0 1 4.2 1.4c0 1.6-1.5 2.8-3.5 4.8L12 13.2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11c1.2 2 3.5 3 6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 11c-1.2 2-3.5 3-6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5c0 2.5 3.5 4.5 9 4.5s9-2 9-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+-        Choose A Plan
+-      </p>
+-      <h2>Straightforward Pricing,<br><em>No Surprises</em></h2>
+-      <p class="pricing-lede">Every plan includes a dedicated care coordinator and family WhatsApp updates. Visits are billed per plan, with no hidden charges.</p>
++      <div class="pp-hero-photo">
++        <img src="images/18.jpeg" alt="A SIDDHI care coordinator on a call with a family, laptop open at her desk">
++        <span class="pp-hero-photo-tag"><span class="live-pulse" aria-hidden="true"></span>Coordinators reachable on WhatsApp</span>
++      </div>
+     </div>
++  </section>
+ 
++  <!-- ===== PRICING ===== -->
++  <section class="pp-pricing" id="plans">
+     <div class="wrap">
+-      <div class="pricing-grid">
++      <div class="pp-head">
++        <p class="section-badge">
++          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12c-2-2-3.5-3.2-3.5-4.8a2.3 2.3 0 0 1 4.2-1.4 2.3 2.3 0 0 1 4.2 1.4c0 1.6-1.5 2.8-3.5 4.8L12 13.2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11c1.2 2 3.5 3 6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 11c-1.2 2-3.5 3-6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5c0 2.5 3.5 4.5 9 4.5s9-2 9-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
++          Choose A Plan
++        </p>
++        <h2>Simple Pricing. Flexible Plans. <em>Complete Peace Of Mind.</em></h2>
++        <p>Choose the right plan for your parents' needs. Every plan includes a dedicated care coordinator and family WhatsApp updates, with no hidden charges.</p>
++      </div>
++
++      <div class="pp-plans">
+ 
+         <!-- SIDDHI CARE PLAN -->
+-        <article class="price-card">
+-          <h3>SIDDHI Care Plan</h3>
+-          <p class="price-desc">A steady base of visits across the year, for everyday support.</p>
++        <article class="price-card pp-plan">
++          <h3 class="pp-plan-name"><small>SIDDHI</small><span>Care Plan</span></h3>
++          <p class="pp-plan-for">For parents who need steady, everyday support</p>
+           <p class="price-amount">₹79,999<span class="price-unit">/year</span></p>
+-          <p class="price-note">15 visits included</p>
++          <span class="pp-plan-permonth">(≈ ₹6,667 per month)</span>
++          <span class="price-note">15 visits included</span>
++          <p class="price-desc">A steady base of visits across the year, for everyday support.</p>
++          <p class="pp-plan-features-title">Features</p>
+           <ul class="price-features">
+             <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.5 10.5 15 16 9.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>15 care visits per year</li>
+             <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.5 10.5 15 16 9.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>4 hours per visit</li>
+             <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.5 10.5 15 16 9.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Dedicated care coordinator</li>
+             <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.5 10.5 15 16 9.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Family WhatsApp updates</li>
++            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.5 10.5 15 16 9.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Covers both parents</li>
+           </ul>
+-          <button type="button" class="btn btn-ghost js-open-consult">Start With A Free Conversation</button>
++          <button type="button" class="btn btn-ghost js-open-consult">Contact Us</button>
+         </article>
+ 
+         <!-- SIDDHI CARE PLUS PLAN (FEATURED) -->
+-        <article class="price-card price-card-featured">
++        <article class="price-card price-card-featured pp-plan pp-plan-featured">
+           <span class="price-ribbon">Best Value</span>
+-          <h3>SIDDHI Care Plus Plan</h3>
+-          <p class="price-desc">More frequent visits for families who want closer, ongoing support.</p>
++          <h3 class="pp-plan-name"><small>SIDDHI</small><span>Care Plus Plan</span></h3>
++          <p class="pp-plan-for">For families who want closer, ongoing support</p>
+           <p class="price-amount">₹1,18,000<span class="price-unit">/year</span></p>
+-          <p class="price-note">25 visits included</p>
++          <span class="pp-plan-permonth">(≈ ₹9,833 per month)</span>
++          <span class="price-note">25 visits included</span>
++          <p class="price-desc">More frequent visits for families who want closer, ongoing support.</p>
++          <p class="pp-plan-features-title">Features</p>
+           <ul class="price-features">
+             <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.5 10.5 15 16 9.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>25 care visits per year</li>
+             <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.5 10.5 15 16 9.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>4 hours per visit</li>
+             <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.5 10.5 15 16 9.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Dedicated care coordinator</li>
+             <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.5 10.5 15 16 9.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Family WhatsApp updates</li>
++            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.5 10.5 15 16 9.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Covers both parents</li>
+           </ul>
+-          <button type="button" class="btn btn-primary js-open-consult">Start With A Free Conversation</button>
++          <button type="button" class="btn btn-primary js-open-consult">Contact Us</button>
+         </article>
+ 
+         <!-- SEMI ANNUAL PLAN -->
+-        <article class="price-card">
+-          <h3>Semi Annual Plan</h3>
+-          <p class="price-desc">A lighter, shorter commitment for families who want to start small.</p>
++        <article class="price-card pp-plan">
++          <h3 class="pp-plan-name"><small>Semi Annual</small><span>Plan</span></h3>
++          <p class="pp-plan-for">For families who want to start small</p>
+           <p class="price-amount">₹45,000<span class="price-unit">/6 months</span></p>
+-          <p class="price-note">7 visits included</p>
++          <span class="pp-plan-permonth">(≈ ₹7,500 per month)</span>
++          <span class="price-note">7 visits included</span>
++          <p class="price-desc">A lighter, shorter commitment for families who want to start small.</p>
++          <p class="pp-plan-features-title">Features</p>
+           <ul class="price-features">
+             <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.5 10.5 15 16 9.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>7 care visits over 6 months</li>
+             <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.5 10.5 15 16 9.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>4 hours per visit</li>
+             <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.5 10.5 15 16 9.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Dedicated care coordinator</li>
+             <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.5 10.5 15 16 9.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Family WhatsApp updates</li>
++            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.5 10.5 15 16 9.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Covers both parents</li>
+           </ul>
+-          <button type="button" class="btn btn-ghost js-open-consult">Talk To A Care Advisor</button>
++          <button type="button" class="btn btn-ghost js-open-consult">Contact Us</button>
+         </article>
+ 
+       </div>
+@@ -133,188 +165,368 @@
+           <p>Additional hour per visit (after 4 hours): <strong>₹300/-</strong></p>
+         </div>
+       </div>
++
++      <div class="pp-pricing-foot">
++        <p>Doctor fees, medicines and hospital bills are billed separately and always shared with you in advance.</p>
++        <button type="button" class="btn btn-primary js-open-consult">Request A Call Back
++          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
++        </button>
++      </div>
+     </div>
+   </section>
+ 
+-  <!-- REASSURANCE BANNER -->
+-  <section class="reassure">
+-    <div class="wrap reassure-inner">
+-      <div class="reassure-copy">
+-        <p class="eyebrow eyebrow-light">Still Deciding?</p>
+-        <h2>Most Families Tell Us They Wish They Had Started Sooner</h2>
+-        <ul class="reassure-list">
+-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 12l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>No lock-in — cancel or switch plans anytime</li>
+-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 12l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>One plan covers both parents, not two subscriptions</li>
+-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 12l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>A dedicated coordinator who actually knows your family</li>
+-        </ul>
++  <!-- ===== ADD-ONS ===== -->
++  <section class="pp-addons" id="addons">
++    <div class="wrap">
++      <div class="pp-head">
++        <p class="section-badge">
++          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12c-2-2-3.5-3.2-3.5-4.8a2.3 2.3 0 0 1 4.2-1.4 2.3 2.3 0 0 1 4.2 1.4c0 1.6-1.5 2.8-3.5 4.8L12 13.2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11c1.2 2 3.5 3 6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 11c-1.2 2-3.5 3-6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5c0 2.5 3.5 4.5 9 4.5s9-2 9-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
++          Add-Ons
++        </p>
++        <h2>Additional <em>Customisation Options</em></h2>
++        <p>Every plan can be extended with focused, ongoing support for specific situations — added when you need it.</p>
+       </div>
+-      <div class="reassure-quote">
+-        <p>"Knowing someone checks on Baba twice a week and actually calls if something feels off has given us real peace of mind."</p>
+-        <strong>— A family we support</strong>
+-        <span>Mumbai</span>
++
++      <div class="pp-addons-grid">
++
++        <article class="addon-card pp-addon">
++          <div class="pp-addon-head">
++            <span class="addon-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/></svg></span>
++            <h3>Overnight Care</h3>
++          </div>
++          <div class="pp-addon-body">
++            <p class="pp-addon-quote">"The first few nights home are when families worry most."</p>
++            <ul>
++              <li>An attendant stays through the night</li>
++              <li>After a surgery, fall, or hospital discharge</li>
++            </ul>
++            <button type="button" class="btn btn-primary js-open-consult">Request A Call Back</button>
++          </div>
++        </article>
++
++        <article class="addon-card pp-addon">
++          <div class="pp-addon-head">
++            <span class="addon-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 12h4l2-6 4 12 2-6h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
++            <h3>Vitals &amp; Diabetes Monitoring</h3>
++          </div>
++          <div class="pp-addon-body">
++            <p class="pp-addon-quote">"Small daily checks catch the big problems early."</p>
++            <ul>
++              <li>Regular health monitoring and medicine management</li>
++              <li>For parents with diabetes, BP, and cardiac conditions</li>
++              <li>Under direct coordinator observation, with regular attendance checks</li>
++            </ul>
++            <button type="button" class="btn btn-primary js-open-consult">Request A Call Back</button>
++          </div>
++        </article>
++
++        <article class="addon-card pp-addon">
++          <div class="pp-addon-head">
++            <span class="addon-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
++            <h3>Post-Surgery Recovery</h3>
++          </div>
++          <div class="pp-addon-body">
++            <p class="pp-addon-quote">"Recovery goes better with someone keeping track."</p>
++            <ul>
++              <li>Extra visits during the recovery window</li>
++              <li>Mobility support at home</li>
++              <li>Follow-up scheduling with doctors</li>
++            </ul>
++            <button type="button" class="btn btn-primary js-open-consult">Request A Call Back</button>
++          </div>
++        </article>
++
++        <article class="addon-card pp-addon">
++          <div class="pp-addon-head">
++            <span class="addon-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 12c-2-2-3.5-3.2-3.5-4.8a2.3 2.3 0 0 1 4.2-1.4 2.3 2.3 0 0 1 4.2 1.4c0 1.6-1.5 2.8-3.5 4.8L12 13.2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11c1.2 2 3.5 3 6 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 11c-1.2 2-3.5 3-6 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5c0 2.5 3.5 4.5 9 4.5s9-2 9-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
++            <h3>Physiotherapy Coordination</h3>
++          </div>
++          <div class="pp-addon-body">
++            <p class="pp-addon-quote">"Therapy only works when the sessions actually happen."</p>
++            <ul>
++              <li>Scheduling of physiotherapy sessions</li>
++              <li>At home or at a clinic</li>
++              <li>Follow-through so no session is missed</li>
++            </ul>
++            <button type="button" class="btn btn-primary js-open-consult">Request A Call Back</button>
++          </div>
++        </article>
++
++        <article class="addon-card pp-addon">
++          <div class="pp-addon-head">
++            <span class="addon-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="7" width="18" height="12" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.6"/></svg></span>
++            <h3>Travel &amp; Outstation Support</h3>
++          </div>
++          <div class="pp-addon-body">
++            <p class="pp-addon-quote">"Every journey planned, so your parents travel at ease."</p>
++            <ul>
++              <li>Journeys to a specialist</li>
++              <li>A hometown visit or a family event</li>
++            </ul>
++            <button type="button" class="btn btn-primary js-open-consult">Request A Call Back</button>
++          </div>
++        </article>
++
++        <article class="addon-card pp-addon">
++          <div class="pp-addon-head">
++            <span class="addon-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 21v-2a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v2M14 7a3 3 0 1 0 6 0 3 3 0 0 0-6 0ZM4 7a3 3 0 1 0 6 0 3 3 0 0 0-6 0Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
++            <h3>Nursing Support</h3>
++          </div>
++          <div class="pp-addon-body">
++            <p class="pp-addon-quote">"Qualified hands for the medical moments."</p>
++            <ul>
++              <li>Qualified nursing visits</li>
++              <li>Wound care and injections</li>
++              <li>Short-term medical needs</li>
++            </ul>
++            <button type="button" class="btn btn-primary js-open-consult">Request A Call Back</button>
++          </div>
++        </article>
++
+       </div>
+     </div>
+   </section>
+ 
+-  <!-- HOW IT WORKS -->
+-  <section class="process process-compact" id="how-it-works-plans">
+-    <div class="wrap process-head">
+-      <p class="section-badge">
+-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12c-2-2-3.5-3.2-3.5-4.8a2.3 2.3 0 0 1 4.2-1.4 2.3 2.3 0 0 1 4.2 1.4c0 1.6-1.5 2.8-3.5 4.8L12 13.2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11c1.2 2 3.5 3 6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 11c-1.2 2-3.5 3-6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5c0 2.5 3.5 4.5 9 4.5s9-2 9-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+-        What Happens Next
+-      </p>
+-      <h2>From First Call To <em>First Day Of Care</em></h2>
+-      <p class="process-lede">Choosing a plan is only the start — here's what happens once you reach out.</p>
++  <!-- ===== "CHOOSE THE BEST PLAN" BAND ===== -->
++  <section class="pp-band">
++    <div class="wrap">
++      <div class="pp-band-inner">
++        <div class="pp-band-copy">
++          <p class="eyebrow eyebrow-light">Still Deciding?</p>
++          <h2>Choose The Best Plan For Your Parents</h2>
++          <p>Talk to our care coordinator for details — no pressure, no cost.</p>
++          <div class="pp-band-actions">
++            <button type="button" class="btn btn-primary js-open-consult">Request A Call Back
++              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
++            </button>
++            <a class="cta-phone-link" href="tel:+917710031734">
++              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.4 0 .8-.3 1l-2.2 2.2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
++              Call 7710 031 734
++            </a>
++          </div>
++        </div>
++        <div class="pp-band-person">
++          <img src="images/diksha-portrait.jpg" alt="Diksha, SIDDHI care coordinator">
++          <span class="pp-band-person-name">Diksha · Care Coordinator</span>
++        </div>
++      </div>
+     </div>
++  </section>
+ 
++  <!-- ===== ACTIVATE CARE — STEPS ===== -->
++  <section class="pp-steps-section" id="how-it-works-plans">
+     <div class="wrap">
+-      <ol class="process-steps">
+-        <li>
+-          <span class="process-num">1</span>
+-          <h3>You Reach Out</h3>
+-          <p>Call us or fill the contact form — takes under two minutes.</p>
++      <div class="pp-head">
++        <p class="section-badge">
++          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12c-2-2-3.5-3.2-3.5-4.8a2.3 2.3 0 0 1 4.2-1.4 2.3 2.3 0 0 1 4.2 1.4c0 1.6-1.5 2.8-3.5 4.8L12 13.2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11c1.2 2 3.5 3 6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 11c-1.2 2-3.5 3-6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5c0 2.5 3.5 4.5 9 4.5s9-2 9-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
++          What Happens Next
++        </p>
++        <h2>Activate Care For <em>Your Parents</em></h2>
++        <p>Choosing a plan is only the start — here's what happens once you reach out.</p>
++      </div>
++
++      <ol class="pp-steps">
++        <li class="pp-step">
++          <div class="pp-step-pill"><img src="images/oncall-support.jpg" alt="">Share Your Details</div>
++          <div class="pp-step-copy">
++            <small>Step 1</small>
++            <h3>You Reach Out</h3>
++            <p>Call us or fill the contact form — takes under two minutes.</p>
++          </div>
+         </li>
+-        <li>
+-          <span class="process-num">2</span>
+-          <h3>A Coordinator Calls You</h3>
+-          <p>Usually within a few hours, to understand your parents' needs.</p>
++        <li class="pp-step">
++          <div class="pp-step-pill"><img src="images/suraj-portrait.jpg" alt="">Talk To Your Coordinator</div>
++          <div class="pp-step-copy">
++            <small>Step 2</small>
++            <h3>A Coordinator Calls You</h3>
++            <p>Usually within a few hours, to understand your parents' needs.</p>
++          </div>
+         </li>
+-        <li>
+-          <span class="process-num">3</span>
+-          <h3>You Choose A Plan</h3>
+-          <p>At your pace, no pressure — switch or customise anytime.</p>
++        <li class="pp-step">
++          <div class="pp-step-pill"><img src="images/15.jpeg" alt="">Choose Your Plan</div>
++          <div class="pp-step-copy">
++            <small>Step 3</small>
++            <h3>You Choose A Plan</h3>
++            <p>At your pace, no pressure — switch or customise anytime.</p>
++          </div>
+         </li>
+-        <li>
+-          <span class="process-num">4</span>
+-          <h3>Care Begins</h3>
+-          <p>Your dedicated care coordinator is introduced to the family.</p>
++        <li class="pp-step">
++          <div class="pp-step-pill"><img src="images/17.jpeg" alt="">Your Plan Is Active
++            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M8 12.5 10.5 15 16 9.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
++          </div>
++          <div class="pp-step-copy">
++            <small>Step 4</small>
++            <h3>Care Begins</h3>
++            <p>Your dedicated care coordinator is introduced to the family.</p>
++          </div>
+         </li>
+       </ol>
+-    </div>
+-  </section>
+ 
+-  <!-- ADD-ONS / CUSTOMISATION -->
+-  <section class="addons" id="addons">
+-    <div class="wrap addons-head">
+-      <p class="section-badge">
+-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12c-2-2-3.5-3.2-3.5-4.8a2.3 2.3 0 0 1 4.2-1.4 2.3 2.3 0 0 1 4.2 1.4c0 1.6-1.5 2.8-3.5 4.8L12 13.2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11c1.2 2 3.5 3 6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 11c-1.2 2-3.5 3-6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5c0 2.5 3.5 4.5 9 4.5s9-2 9-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+-        Add-Ons
+-      </p>
+-      <h2>Extra Support,<br><em>Added When You Need It</em></h2>
+-      <p class="addons-lede">Every plan can be extended with focused, ongoing support for specific situations.</p>
++      <div class="pp-steps-cta">
++        <button type="button" class="btn btn-primary js-open-consult">Request A Call Back
++          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
++        </button>
++      </div>
+     </div>
++  </section>
+ 
++  <!-- ===== TESTIMONIALS (same quotes as the homepage) ===== -->
++  <section class="pp-testimonials">
+     <div class="wrap">
+-      <div class="addons-grid">
+-        <article class="addon-card">
+-          <span class="addon-icon" aria-hidden="true">
+-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/></svg>
+-          </span>
+-          <h3>Overnight Care</h3>
+-          <p>An attendant stays through the night after a surgery, fall, or hospital discharge.</p>
+-        </article>
+-        <article class="addon-card">
+-          <span class="addon-icon" aria-hidden="true">
+-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 12h4l2-6 4 12 2-6h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+-          </span>
+-          <h3>Vitals &amp; Diabetes Monitoring - Under Coordinator Observation</h3>
+-          <p>Responsible for regular health monitoring and medicine management for elderly parents with diabetes, BP, and cardiac conditions, under direct observation of the coordinator with regular attendance checks.</p>
+-        </article>
+-        <article class="addon-card">
+-          <span class="addon-icon" aria-hidden="true">
+-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+-          </span>
+-          <h3>Post-Surgery Recovery</h3>
+-          <p>Extra visits, mobility support, and follow-up scheduling during the recovery window.</p>
+-        </article>
+-        <article class="addon-card">
+-          <span class="addon-icon" aria-hidden="true">
+-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 12c-2-2-3.5-3.2-3.5-4.8a2.3 2.3 0 0 1 4.2-1.4 2.3 2.3 0 0 1 4.2 1.4c0 1.6-1.5 2.8-3.5 4.8L12 13.2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11c1.2 2 3.5 3 6 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 11c-1.2 2-3.5 3-6 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5c0 2.5 3.5 4.5 9 4.5s9-2 9-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+-          </span>
+-          <h3>Physiotherapy Coordination</h3>
+-          <p>Scheduling and follow-through on physiotherapy sessions at home or at a clinic.</p>
++      <div class="pp-head">
++        <p class="section-badge">
++          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12c-2-2-3.5-3.2-3.5-4.8a2.3 2.3 0 0 1 4.2-1.4 2.3 2.3 0 0 1 4.2 1.4c0 1.6-1.5 2.8-3.5 4.8L12 13.2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11c1.2 2 3.5 3 6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 11c-1.2 2-3.5 3-6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5c0 2.5 3.5 4.5 9 4.5s9-2 9-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
++          Families We Support
++        </p>
++        <h2>Hear What Families <em>Say About Us</em></h2>
++      </div>
++
++      <div class="testimonials-grid">
++        <article class="testimonial-card">
++          <p class="pp-testimonial-where">Mumbai</p>
++          <div class="testimonial-stars" aria-label="5 out of 5 stars">★★★★★</div>
++          <p class="testimonial-quote">"The coordinator they matched us with is wonderful. She checks on my mother twice a week and actually calls if something feels off. We finally feel at peace knowing Ma is looked after while we're at work."</p>
++          <div class="testimonial-person">
++            <span class="testimonial-avatar" aria-hidden="true">P</span>
++            <div>
++              <p class="testimonial-name">Priya S.</p>
++              <p class="testimonial-role">Daughter of client</p>
++            </div>
++          </div>
+         </article>
+-        <article class="addon-card">
+-          <span class="addon-icon" aria-hidden="true">
+-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="7" width="18" height="12" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.6"/></svg>
+-          </span>
+-          <h3>Travel &amp; Outstation Support</h3>
+-          <p>Coordination for journeys to a specialist, a hometown visit, or a family event.</p>
++        <article class="testimonial-card">
++          <p class="pp-testimonial-where">Virar</p>
++          <div class="testimonial-stars" aria-label="5 out of 5 stars">★★★★★</div>
++          <p class="testimonial-quote">"After my father's surgery, we didn't know how we'd manage his hospital follow-ups. SIDDHI coordinated everything within a day and made the whole transition home smooth and stress-free."</p>
++          <div class="testimonial-person">
++            <span class="testimonial-avatar" aria-hidden="true">A</span>
++            <div>
++              <p class="testimonial-name">Arjun M.</p>
++              <p class="testimonial-role">Son of client</p>
++            </div>
++          </div>
+         </article>
+-        <article class="addon-card">
+-          <span class="addon-icon" aria-hidden="true">
+-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 21v-2a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v2M14 7a3 3 0 1 0 6 0 3 3 0 0 0-6 0ZM4 7a3 3 0 1 0 6 0 3 3 0 0 0-6 0Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+-          </span>
+-          <h3>Nursing Support</h3>
+-          <p>Qualified nursing visits for wound care, injections, or short-term medical needs.</p>
++        <article class="testimonial-card">
++          <p class="pp-testimonial-where">Based Abroad</p>
++          <div class="testimonial-stars" aria-label="5 out of 5 stars">★★★★★</div>
++          <p class="testimonial-quote">"I live abroad and was constantly worried about my grandmother living alone. The WhatsApp updates twice a week changed everything — I actually know how she's doing instead of just hoping."</p>
++          <div class="testimonial-person">
++            <span class="testimonial-avatar" aria-hidden="true">N</span>
++            <div>
++              <p class="testimonial-name">Neha R.</p>
++              <p class="testimonial-role">Granddaughter of client</p>
++            </div>
++          </div>
+         </article>
+       </div>
+     </div>
+   </section>
+ 
+-  <!-- FAQ -->
+-  <section class="faq" id="faq">
+-    <div class="wrap faq-head">
+-      <p class="section-badge">
+-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12c-2-2-3.5-3.2-3.5-4.8a2.3 2.3 0 0 1 4.2-1.4 2.3 2.3 0 0 1 4.2 1.4c0 1.6-1.5 2.8-3.5 4.8L12 13.2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11c1.2 2 3.5 3 6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 11c-1.2 2-3.5 3-6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5c0 2.5 3.5 4.5 9 4.5s9-2 9-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+-        Questions
+-      </p>
+-      <h2>Frequently Asked<br><em>Questions</em></h2>
+-    </div>
+-
++  <!-- ===== FAQ ===== -->
++  <section class="pp-faq" id="faq">
+     <div class="wrap">
++      <div class="pp-head">
++        <p class="section-badge">
++          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12c-2-2-3.5-3.2-3.5-4.8a2.3 2.3 0 0 1 4.2-1.4 2.3 2.3 0 0 1 4.2 1.4c0 1.6-1.5 2.8-3.5 4.8L12 13.2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11c1.2 2 3.5 3 6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 11c-1.2 2-3.5 3-6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5c0 2.5 3.5 4.5 9 4.5s9-2 9-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
++          Questions
++        </p>
++        <h2>Frequently Asked <em>Questions</em></h2>
++      </div>
++
+       <div class="faq-list">
+         <details class="faq-item">
+           <summary>Can a plan be customised to our family's needs?<span class="faq-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></summary>
+           <p>Yes. Every plan is a starting point — your coordinator will adjust visit frequency, add-ons, and check-in schedules once they understand your parents' routine and needs.</p>
+         </details>
+         <details class="faq-item">
+-          <summary>What exactly is covered in the monthly cost?<span class="faq-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></summary>
++          <summary>What exactly is covered in the plan price?<span class="faq-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></summary>
+           <p>Your coordinator's visits, on-call support, and coordination work are included. Third-party costs — like doctor fees, hospital bills, or medicines — are billed separately and always shared with you in advance.</p>
+         </details>
+         <details class="faq-item">
+-          <summary>Can I subscribe to only part of a plan?</summary>
++          <summary>Can I subscribe to only part of a plan?<span class="faq-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></summary>
+           <p>In most cases, yes — talk to a care advisor about which parts of a plan matter most to your family, and we'll put together something that fits.</p>
+         </details>
+         <details class="faq-item">
+-          <summary>Do you provide care for parents with dementia?</summary>
+-          <p>Yes, through our Specialised Care plan, with attendants trained specifically for cognitive care and a plan built around your family's situation.</p>
++          <summary>Do you provide care for parents with dementia?<span class="faq-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></summary>
++          <p>Yes, with attendants trained specifically for cognitive care and a plan built around your family's situation.</p>
+         </details>
+         <details class="faq-item">
+-          <summary>Is there a lock-in period?</summary>
++          <summary>Is there a lock-in period?<span class="faq-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></summary>
+           <p>No. You can pause, switch plans, or cancel at any time — we don't believe in locking families into a plan that no longer fits.</p>
+         </details>
+         <details class="faq-item">
+-          <summary>Can I upgrade my plan later if my parents' needs change?</summary>
++          <summary>Can I upgrade my plan later if my parents' needs change?<span class="faq-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></summary>
+           <p>Absolutely — your coordinator will flag when a change in health or routine means a different plan would serve your parents better, and upgrading takes effect immediately.</p>
+         </details>
+       </div>
+     </div>
+   </section>
+ 
+-  <!-- CONTACT / CTA -->
+-  <section class="cta" id="contact-plan">
++  <!-- ===== CITY AVAILABILITY FORM (same FormSubmit endpoint as the modal) ===== -->
++  <section class="pp-contact" id="contact-plan">
+     <div class="wrap">
+-      <div class="cta-media">
+-        <p class="cta-badge">
+-          <span class="live-pulse" aria-hidden="true"></span>
+-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12c-2-2-3.5-3.2-3.5-4.8a2.3 2.3 0 0 1 4.2-1.4 2.3 2.3 0 0 1 4.2 1.4c0 1.6-1.5 2.8-3.5 4.8L12 13.2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11c1.2 2 3.5 3 6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 11c-1.2 2-3.5 3-6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5c0 2.5 3.5 4.5 9 4.5s9-2 9-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+-          Not Sure Which Plan Fits?
+-        </p>
+-        <h2 class="cta-heading">Talk To A Care Advisor — <em>No Pressure, No Cost</em></h2>
+-        <p class="cta-lede">Share your parents' situation and we'll recommend the right plan, or build a custom one around what actually matters to your family.</p>
+-        <div class="cta-actions">
+-          <a class="btn btn-primary btn-large" href="tel:+918369180832">Start With A Free Conversation
+-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+-          </a>
+-          <a class="hero-phone-link cta-phone-link" href="tel:+918369180832">
+-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.4 0 .8-.3 1l-2.2 2.2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+-            Call 7710 031 734
+-          </a>
+-          <a class="hero-phone-link cta-phone-link" href="tel:+918369180832">
+-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.4 0 .8-.3 1l-2.2 2.2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+-            Call 9136 648 667
+-          </a>
++      <div class="pp-contact-media">
++        <div class="pp-contact-copy">
++          <p class="cta-badge"><span class="live-pulse" aria-hidden="true"></span>Not Sure Which Plan Fits?</p>
++          <h2>Find Out If We Serve <em>Your Parents' Area</em></h2>
++          <p>Share your parents' city and a care coordinator will call you back — usually within a few hours.</p>
++          <div class="pp-contact-areas">
++            <span>Mumbai</span><span>Andheri</span><span>Bandra</span><span>Powai</span><span>Virar</span>
++          </div>
++        </div>
++
++        <div class="pp-form-card">
++          <form class="pp-inline-form" id="plansForm" action="https://formsubmit.co/ajax/support@siddhieldercare.com" method="POST">
++            <h3>Request A Call Back</h3>
++            <p class="pp-form-lede">Takes under two minutes.</p>
++
++            <input type="hidden" name="_subject" value="New Plans Page Enquiry — SIDDHI ElderCare">
++            <input type="hidden" name="_template" value="table">
++            <input type="hidden" name="_captcha" value="false">
++
++            <div class="form-row">
++              <label for="ppName">Name*</label>
++              <input type="text" id="ppName" name="Name" placeholder="Please enter your name" required>
++            </div>
++            <div class="form-row">
++              <label for="ppEmail">Your Email*</label>
++              <input type="email" id="ppEmail" name="Email" placeholder="To share details" required>
++            </div>
++            <div class="form-row">
++              <label for="ppPhone">Your Phone Number*</label>
++              <div class="phone-input-group">
++                <span class="phone-prefix">+91</span>
++                <input type="tel" id="ppPhone" name="Phone" placeholder="98765 43210" required>
++              </div>
++            </div>
++            <div class="form-row">
++              <label for="ppCity">Parent's City*</label>
++              <input type="text" id="ppCity" name="Parent's City" placeholder="Where is care required?" required>
++            </div>
++            <div class="form-row">
++              <label for="ppPlan">Plan Of Interest</label>
++              <select id="ppPlan" name="Plan">
++                <option>Not sure yet</option>
++                <option>SIDDHI Care Plan</option>
++                <option>SIDDHI Care Plus Plan</option>
++                <option>Semi Annual Plan</option>
++              </select>
++            </div>
++            <div class="consent-row">
++              <input type="checkbox" id="ppConsent" name="Consent" value="Yes" required>
++              <label for="ppConsent">By submitting this form, you agree to receive calls from SIDDHI ElderCare Services regarding our services.</label>
++            </div>
++            <button type="submit" class="btn btn-primary btn-large">Submit
++              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
++            </button>
++            <p class="pp-form-error" id="plansFormError">Something went wrong. Please call us on <a href="tel:+917710031734">7710 031 734</a>.</p>
++          </form>
++
++          <div class="pp-form-success" id="plansFormSuccess">
++            <svg width="46" height="46" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.5 10.5 15 16 9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
++            <h3>Thank You!</h3>
++            <p>A care coordinator will call you back shortly.</p>
++          </div>
+         </div>
+       </div>
+     </div>
+@@ -355,7 +567,7 @@
+ 
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <a href="team.html">Our Team</a>
+       <a href="#faq">FAQ</a>
+       <a href="index.html#resources">Blog &amp; Guides</a>
+@@ -371,6 +583,7 @@
+     </div>
+   </div>
+ </footer>
++
+ <!-- FREE CONSULTATION MODAL -->
+ <div class="modal-overlay" id="consultModal" role="dialog" aria-modal="true" aria-labelledby="consultModalTitle">
+   <div class="modal-card">
+@@ -424,12 +637,35 @@
+       <div class="modal-success">
+         <svg width="46" height="46" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.5 10.5 15 16 9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+         <h3>Thank You!</h3>
+-<p>A care coordinator will call you back shortly.</p>      </div>
+-
++        <p>A care coordinator will call you back shortly.</p>
++      </div>
+     </div>
+   </div>
+ </div>
+ 
+ <script src="script.js"></script>
++<script>
++  // Inline "Request A Call Back" form on the plans page — same FormSubmit flow as the modal
++  (function () {
++    const form = document.getElementById('plansForm');
++    if (!form) return;
++    const success = document.getElementById('plansFormSuccess');
++    const error = document.getElementById('plansFormError');
++
++    form.addEventListener('submit', function (e) {
++      e.preventDefault();
++      error.classList.remove('is-visible');
++      const btn = form.querySelector('button[type="submit"]');
++      const label = btn.innerHTML;
++      btn.disabled = true;
++      btn.textContent = 'Sending…';
++
++      fetch(form.action, { method: 'POST', headers: { Accept: 'application/json' }, body: new FormData(form) })
++        .then(function (res) { if (!res.ok) throw new Error('Request failed'); return res.json(); })
++        .then(function () { form.classList.add('is-hidden'); success.classList.add('is-visible'); })
++        .catch(function () { error.classList.add('is-visible'); btn.disabled = false; btn.innerHTML = label; });
++    });
++  })();
++</script>
+ </body>
+-</html>
+\ No newline at end of file
++</html>
+diff --git a/privacy.html b/privacy.html
+index df263d9..c02648a 100644
+--- a/privacy.html
++++ b/privacy.html
+@@ -25,7 +25,7 @@
+     <nav class="site-nav" id="siteNav" aria-label="Primary">
+       <a href="index.html#top">Home</a>
+       <a href="services.html">Services</a>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact</a>
+     </nav>
+@@ -186,7 +186,7 @@
+ 
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact Us</a>
+       <a href="resources.html">Blog &amp; Guides</a>
+diff --git a/refund.html b/refund.html
+index 573bad6..d33cda5 100644
+--- a/refund.html
++++ b/refund.html
+@@ -25,7 +25,7 @@
+     <nav class="site-nav" id="siteNav" aria-label="Primary">
+       <a href="index.html#top">Home</a>
+       <a href="services.html">Services</a>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact</a>
+     </nav>
+@@ -135,7 +135,7 @@
+ 
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact Us</a>
+       <a href="resources.html">Blog &amp; Guides</a>
+diff --git a/resources.html b/resources.html
+index 0896438..29754e6 100644
+--- a/resources.html
++++ b/resources.html
+@@ -24,7 +24,7 @@
+     <nav class="site-nav" id="siteNav" aria-label="Primary">
+       <a href="index.html#top">Home</a>
+       <a href="services.html">Services</a>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <!-- <a href="index.html#how-it-works">How it works</a> -->
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact</a>
+@@ -127,7 +127,7 @@
+ 
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact Us</a>
+       <a href="resources.html">Blog &amp; Guides</a>
+diff --git a/services.html b/services.html
+index e8a05a2..1b0ae98 100644
+--- a/services.html
++++ b/services.html
+@@ -23,7 +23,7 @@
+     <nav class="site-nav" id="siteNav" aria-label="Primary">
+       <a href="index.html#top">Home</a>
+       <a href="services.html" class="is-active">Services</a>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <!-- <a href="index.html#how-it-works">How it works</a> -->
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact</a>
+@@ -344,7 +344,7 @@
+ 
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact Us</a>
+       <a href="index.html#resources">Blog &amp; Guides</a>
+diff --git a/team.html b/team.html
+index 8e659c4..2a6724f 100644
+--- a/team.html
++++ b/team.html
+@@ -25,7 +25,7 @@
+     <nav class="site-nav" id="siteNav" aria-label="Primary">
+       <a href="index.html#top">Home</a>
+       <a href="services.html">Services</a>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <a href="team.html" class="is-active">Our Team</a>
+       <a href="contact.html">Contact</a>
+     </nav>
+@@ -274,7 +274,7 @@
+ 
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact Us</a>
+       <a href="index.html#resources">Blog &amp; Guides</a>
+diff --git a/terms.html b/terms.html
+index a75a510..4589ccb 100644
+--- a/terms.html
++++ b/terms.html
+@@ -25,7 +25,7 @@
+     <nav class="site-nav" id="siteNav" aria-label="Primary">
+       <a href="index.html#top">Home</a>
+       <a href="services.html">Services</a>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact</a>
+     </nav>
+@@ -160,7 +160,7 @@
+ 
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+-      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="plans.html">Plans &amp; Pricing</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact Us</a>
+       <a href="resources.html">Blog &amp; Guides</a>
+-- 
+2.43.0
+
