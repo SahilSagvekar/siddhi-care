@@ -465,76 +465,6 @@ If you are looking for trustworthy elder care support, Sidhi is exceptional. Hig
     </div>
   </section>
 
-  <!-- ===== CITY AVAILABILITY FORM (same FormSubmit endpoint as the modal) ===== -->
-  <section class="pp-contact" id="contact-plan">
-    <div class="wrap">
-      <div class="pp-contact-media">
-        <div class="pp-contact-copy">
-          <p class="cta-badge"><span class="live-pulse" aria-hidden="true"></span>Not Sure Which Plan Fits?</p>
-          <h2>Find Out If We Serve <em>Your Parents' Area</em></h2>
-          <p>Share your parents' city and a care coordinator will call you back — usually within a few hours.</p>
-          <div class="pp-contact-areas">
-            <span>Mumbai</span><span>Andheri</span><span>Bandra</span><span>Powai</span><span>Virar</span>
-          </div>
-        </div>
-
-        <div class="pp-form-card">
-          <form class="pp-inline-form" id="plansForm" action="https://formsubmit.co/ajax/support@siddhieldercare.com" method="POST">
-            <h3>Request A Call Back</h3>
-            <p class="pp-form-lede">Takes under two minutes.</p>
-
-            <input type="hidden" name="_subject" value="New Plans Page Enquiry — SIDDHI ElderCare">
-            <input type="hidden" name="_template" value="table">
-            <input type="hidden" name="_captcha" value="false">
-
-            <div class="form-row">
-              <label for="ppName">Name*</label>
-              <input type="text" id="ppName" name="Name" placeholder="Please enter your name" required>
-            </div>
-            <div class="form-row">
-              <label for="ppEmail">Your Email*</label>
-              <input type="email" id="ppEmail" name="Email" placeholder="To share details" required>
-            </div>
-            <div class="form-row">
-              <label for="ppPhone">Your Phone Number*</label>
-              <div class="phone-input-group">
-                <span class="phone-prefix">+91</span>
-                <input type="tel" id="ppPhone" name="Phone" placeholder="98765 43210" required>
-              </div>
-            </div>
-            <div class="form-row">
-              <label for="ppCity">Parent's City*</label>
-              <input type="text" id="ppCity" name="Parent's City" placeholder="Where is care required?" required>
-            </div>
-            <div class="form-row">
-              <label for="ppPlan">Plan Of Interest</label>
-              <select id="ppPlan" name="Plan">
-                <option>Not sure yet</option>
-                <option>SIDDHI Care Plan</option>
-                <option>SIDDHI Care Plus Plan</option>
-                <option>Semi Annual Plan</option>
-              </select>
-            </div>
-            <div class="consent-row">
-              <input type="checkbox" id="ppConsent" name="Consent" value="Yes" required>
-              <label for="ppConsent">By submitting this form, you agree to receive calls from SIDDHI ElderCare Services regarding our services.</label>
-            </div>
-            <button type="submit" class="btn btn-primary btn-large">Submit
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-            <p class="pp-form-error" id="plansFormError">Something went wrong. Please call us on <a href="tel:+917710031734">7710 031 734</a>.</p>
-          </form>
-
-          <div class="pp-form-success" id="plansFormSuccess">
-            <svg width="46" height="46" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.5 10.5 15 16 9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <h3>Thank You!</h3>
-            <p>A care coordinator will call you back shortly.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
 </main>
 
 <footer class="site-footer">
@@ -647,28 +577,5 @@ If you are looking for trustworthy elder care support, Sidhi is exceptional. Hig
 </div>
 
 <script src="script.js"></script>
-<script>
-  // Inline "Request A Call Back" form on the plans page — same FormSubmit flow as the modal
-  (function () {
-    const form = document.getElementById('plansForm');
-    if (!form) return;
-    const success = document.getElementById('plansFormSuccess');
-    const error = document.getElementById('plansFormError');
-
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      error.classList.remove('is-visible');
-      const btn = form.querySelector('button[type="submit"]');
-      const label = btn.innerHTML;
-      btn.disabled = true;
-      btn.textContent = 'Sending…';
-
-      fetch(form.action, { method: 'POST', headers: { Accept: 'application/json' }, body: new FormData(form) })
-        .then(function (res) { if (!res.ok) throw new Error('Request failed'); return res.json(); })
-        .then(function () { form.classList.add('is-hidden'); success.classList.add('is-visible'); })
-        .catch(function () { error.classList.add('is-visible'); btn.disabled = false; btn.innerHTML = label; });
-    });
-  })();
-</script>
 </body>
 </html>
