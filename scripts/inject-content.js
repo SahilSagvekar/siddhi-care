@@ -10,6 +10,7 @@
 const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
+const { renderTestimonials } = require('../lib/testimonials');
 
 const ROOT = path.join(__dirname, '..');
 const PAGES = ['index', 'services', 'plans', 'team', 'contact'];
@@ -60,3 +61,38 @@ function injectPage(page) {
 for (const page of PAGES) {
   injectPage(page);
 }
+
+// ---------------------------------------------------------------------------
+// testimonials.html — the review cards are generated from
+// content/testimonials.json and written between two marker comments, so the
+// page is still plain static HTML (readable by Google, no runtime fetch).
+// Plain string replacement is used here (not cheerio) so nothing else in the
+// file is touched and the step is safe to run repeatedly.
+// ---------------------------------------------------------------------------
+function renderTestimonialsPage() {
+  const htmlPath = path.join(ROOT, 'testimonials.html');
+  const jsonPath = path.join(ROOT, 'content', 'testimonials.json');
+  if (!fs.existsSync(htmlPath) || !fs.existsSync(jsonPath)) {
+    console.log('[inject-content] skip testimonials: missing testimonials.html or content/testimonials.json');
+    return;
+  }
+
+  const START = '<!-- TESTIMONIALS:START -->';
+  const END = '<!-- TESTIMONIALS:END -->';
+  const html = fs.readFileSync(htmlPath, 'utf8');
+  const a = html.indexOf(START);
+  const b = html.indexOf(END);
+  if (a === -1 || b === -1 || b < a) {
+    console.warn('[inject-content] testimonials.html: marker comments not found — nothing rendered');
+    return;
+  }
+
+  const data = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+  const body = renderTestimonials(data);
+  const next = html.slice(0, a + START.length) + '\n' + body + '\n    ' + html.slice(b);
+  if (next !== html) fs.writeFileSync(htmlPath, next);
+  const count = Array.isArray(data.reviews) ? data.reviews.length : 0;
+  console.log(`[inject-content] testimonials.html: rendered ${count} review(s)`);
+}
+
+renderTestimonialsPage();

@@ -1,0 +1,1840 @@
+From 2729f2387b6b8fbbdabaff96e68fcc51996af844 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 28 Oct 2026 01:49:03 +0000
+Subject: [PATCH] Add Testimonials page with admin manager (text +
+ YouTube/Vimeo video reviews)
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01F6M584kkfEz2iKthjEueMg
+---
+ README-ADMIN.md                               |  24 ++
+ admin/index.html                              | 322 ++++++++++++++++++
+ api/content.js                                |  32 +-
+ ...e-best-home-care-services-for-parents.html |   2 +
+ consistent-care-quality-of-life-seniors.html  |   2 +
+ contact.html                                  |   2 +
+ content/testimonials.json                     |  17 +
+ home-health-care-independent-living.html      |   2 +
+ index.html                                    |   2 +
+ lib/github.js                                 |  20 +-
+ lib/testimonials.js                           | 321 +++++++++++++++++
+ plans.html                                    |   2 +
+ privacy.html                                  |   2 +
+ refund.html                                   |   2 +
+ resources.html                                |   2 +
+ scripts/inject-content.js                     |  36 ++
+ services.html                                 |   2 +
+ style.css                                     |   3 +-
+ team.html                                     |   2 +
+ terms.html                                    |   2 +
+ testimonials.css                              | 308 +++++++++++++++++
+ testimonials.html                             | 259 ++++++++++++++
+ testimonials.js                               |  83 +++++
+ 23 files changed, 1444 insertions(+), 5 deletions(-)
+ create mode 100644 content/testimonials.json
+ create mode 100644 lib/testimonials.js
+ create mode 100644 testimonials.css
+ create mode 100644 testimonials.html
+ create mode 100644 testimonials.js
+
+diff --git a/README-ADMIN.md b/README-ADMIN.md
+index d84da52..62957d8 100644
+--- a/README-ADMIN.md
++++ b/README-ADMIN.md
+@@ -118,6 +118,30 @@ Extending coverage is mechanical, not a new architecture.
+ The admin form itself needs **no changes** for any of this — it renders
+ inputs generically from whatever shape `content/<page>.json` has.
+ 
++## Testimonials (reviews and videos)
++
++The Testimonials page is managed from **/admin → Testimonials**. Add, edit,
++reorder (↑↓), hide, feature or delete reviews, then click **Save changes**.
++Saving commits `content/testimonials.json` to GitHub and Vercel redeploys
++(about a minute). The build (`scripts/inject-content.js`) renders the reviews
++into `testimonials.html` between the `<!-- TESTIMONIALS:START -->` and
++`<!-- TESTIMONIALS:END -->` markers, so the page is plain static HTML.
++
++Each review: `id, name, relation, city, rating (1-5), text, videoUrl,
++vertical, thumbnail, featured, visible`. A review needs a name plus text, a
++video, or both. Only one review can be **featured** (shown large at the top).
++
++**Videos are links, not uploads.** Upload the video to YouTube (set it to
++*Unlisted*) or Vimeo and paste the link. Supported: `youtu.be/…`,
++`youtube.com/watch?v=…`, `/shorts/…`, `/embed/…`, `vimeo.com/<id>`. Anything
++else is rejected on save. YouTube gets an automatic preview image; Vimeo needs
++a custom thumbnail URL (optional). Videos play in a pop-up using
++youtube-nocookie / Vimeo players only.
++
++Notes: the stats strip appears only once there are 3+ visible reviews, and
++filter chips only when both video and text reviews exist. All text is escaped
++on render and validated again on the server (`lib/testimonials.js`).
++
+ ## Known cosmetic side effect
+ 
+ The build script parses and re-serializes each HTML file, which normalizes
+diff --git a/admin/index.html b/admin/index.html
+index cbc4ba5..efaaac7 100644
+--- a/admin/index.html
++++ b/admin/index.html
+@@ -66,6 +66,47 @@
+   .hint{ font-size:0.78rem; color:var(--ink-soft); }
+   #loading{ color:var(--ink-soft); font-size:0.9rem; }
+ 
++
++  /* Testimonials manager */
++  .ta-top{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:6px; }
++  .ta-top h2{ margin:0; font-size:1.15rem; }
++  .ta-top .btn{ width:auto; }
++  .ta-help{ background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; margin:0 0 18px; font-size:0.84rem; color:var(--ink-soft); }
++  .ta-help strong{ color:var(--ink); }
++  .ta-help ol{ margin:6px 0 0; padding-left:18px; }
++  .ta-item{ padding:0 !important; overflow:hidden; }
++  .ta-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; flex-wrap:wrap; }
++  .ta-title{ display:flex; flex-direction:column; min-width:0; flex:1 1 220px; }
++  .ta-title strong{ font-size:0.95rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
++  .ta-meta{ font-size:0.78rem; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
++  .ta-badges{ display:flex; gap:6px; flex-wrap:wrap; }
++  .ta-badge{ font-size:0.66rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; padding:3px 9px; border-radius:999px; background:var(--sand); color:var(--pine-dark); }
++  .ta-badge.video{ background:#dbeaf3; }
++  .ta-badge.featured{ background:var(--marigold); }
++  .ta-badge.hidden{ background:#f2dcda; color:var(--clayrose); }
++  .ta-controls{ display:flex; gap:6px; }
++  .ta-controls button{ background:#fff; border:1.5px solid var(--line); border-radius:8px; padding:6px 10px; font-size:0.8rem; font-weight:600; color:var(--ink-soft); }
++  .ta-controls button:hover:not(:disabled){ border-color:var(--pine); color:var(--pine-dark); }
++  .ta-controls button:disabled{ opacity:0.35; cursor:default; }
++  .ta-controls .ta-del:hover{ border-color:var(--clayrose); color:var(--clayrose); }
++  .ta-panel{ padding:4px 18px 8px; border-top:1px solid var(--line); background:var(--cream); }
++  .ta-panel[hidden]{ display:none; }
++  .ta-panel .field{ margin-top:14px; }
++  .ta-row{ display:grid; grid-template-columns:1fr 1fr 110px; gap:12px; }
++  .ta-row .field{ min-width:0; }
++  .field select{ font-family:inherit; font-size:0.92rem; padding:10px 12px; border:1.5px solid var(--line); border-radius:8px; background:#fff; color:var(--ink); }
++  .ta-panel textarea{ min-height:120px; }
++  .ta-note{ font-size:0.76rem; color:var(--ink-soft); margin:0; }
++  .ta-vstatus{ font-size:0.8rem; margin:2px 0 0; }
++  .ta-vstatus.ok{ color:var(--pine); }
++  .ta-vstatus.bad{ color:var(--clayrose); }
++  .ta-vprev{ width:160px; border-radius:10px; margin-top:8px; display:block; }
++  .ta-checks{ display:flex; flex-direction:column; gap:8px; margin:16px 0 12px; }
++  .ta-check{ display:flex; align-items:flex-start; gap:10px; font-size:0.86rem; cursor:pointer; }
++  .ta-check input{ margin-top:3px; accent-color:var(--pine); }
++  .ta-empty{ text-align:center; color:var(--ink-soft); padding:30px 10px; font-size:0.9rem; }
++  @media (max-width:620px){ .ta-row{ grid-template-columns:1fr; } }
++
+   /* Invoice tool */
+   .invoice-toolbar{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+   .invoice-toolbar .btn{ width:auto; }
+@@ -285,6 +326,14 @@
+       btn.addEventListener('click', () => loadPage(page, btn));
+       picker.appendChild(btn);
+     });
++    const testimonialsBtn = document.createElement('button');
++    testimonialsBtn.textContent = 'Testimonials';
++    testimonialsBtn.addEventListener('click', () => {
++      document.querySelectorAll('.page-picker button').forEach((b) => b.classList.remove('is-active'));
++      testimonialsBtn.classList.add('is-active');
++      renderTestimonialsUI(document.getElementById('editorArea'));
++    });
++    picker.appendChild(testimonialsBtn);
+ 
+     const tools = document.getElementById('toolsPicker');
+     const toolsLabel = document.createElement('p');
+@@ -462,6 +511,279 @@
+     return div.innerHTML;
+   }
+ 
++  // ---------- Testimonials manager ----------
++  // Reviews (written and/or video) live in content/testimonials.json and are
++  // rendered into testimonials.html at build time. Videos are YouTube/Vimeo
++  // links — nothing is uploaded here, so there is no storage to manage.
++  function parseVideoLink(input) {
++    const raw = String(input || '').trim();
++    if (!raw) return null;
++    let u;
++    try { u = new URL(/^https?:\/\//i.test(raw) ? raw : 'https://' + raw); } catch { return null; }
++    const host = u.hostname.toLowerCase().replace(/^(www|m)\./, '');
++    const seg = u.pathname.split('/').filter(Boolean);
++    let id = null;
++    let vertical = false;
++    if (host === 'youtu.be') id = seg[0];
++    else if (host === 'youtube.com' || host === 'youtube-nocookie.com') {
++      if (seg[0] === 'watch') id = u.searchParams.get('v');
++      else if (['shorts', 'embed', 'live', 'v'].includes(seg[0])) id = seg[1];
++      vertical = seg[0] === 'shorts';
++    }
++    if (id && /^[A-Za-z0-9_-]{11}$/.test(id)) {
++      return { provider: 'YouTube', thumb: 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg', vertical };
++    }
++    let vm = null;
++    if (host === 'vimeo.com') vm = seg[0];
++    else if (host === 'player.vimeo.com' && seg[0] === 'video') vm = seg[1];
++    if (vm && /^\d{5,12}$/.test(vm)) return { provider: 'Vimeo', thumb: '', vertical: false };
++    return null;
++  }
++
++  function tEl(tag, cls, text) {
++    const node = document.createElement(tag);
++    if (cls) node.className = cls;
++    if (text != null) node.textContent = text;
++    return node;
++  }
++
++  async function renderTestimonialsUI(container) {
++    container.innerHTML = '<p id="loading">Loading testimonials…</p>';
++    let reviews = [];
++    try {
++      const res = await api('/api/content?page=testimonials');
++      reviews = Array.isArray(res.data && res.data.reviews) ? res.data.reviews : [];
++    } catch (err) {
++      if (!/does not exist/i.test(err.message)) {
++        container.innerHTML = '<p class="error is-visible">' + escapeHtml(err.message) + '</p>';
++        return;
++      }
++    }
++    reviews.forEach((r) => { r._open = false; });
++
++    container.innerHTML = '';
++    const top = tEl('div', 'ta-top');
++    top.appendChild(tEl('h2', null, 'Testimonials'));
++    const addBtn = tEl('button', 'btn', '+ Add review');
++    addBtn.type = 'button';
++    top.appendChild(addBtn);
++    container.appendChild(top);
++
++    const help = tEl('div', 'ta-help');
++    help.innerHTML =
++      '<strong>Adding a video testimonial:</strong>' +
++      '<ol><li>Upload the video to YouTube (set visibility to <strong>Unlisted</strong>) or Vimeo.</li>' +
++      '<li>Copy the video link and paste it into the review’s “Video link” box.</li>' +
++      '<li>Save — the page updates in about a minute. Reviews can have text, a video, or both.</li></ol>';
++    container.appendChild(help);
++
++    const list = tEl('div', 'ta-list');
++    container.appendChild(list);
++
++    const saveBar = tEl('div', 'save-bar');
++    const saveBtn = tEl('button', 'btn', 'Save changes');
++    saveBtn.type = 'button';
++    saveBar.appendChild(saveBtn);
++    saveBar.appendChild(tEl('span', 'hint', 'Saved changes go live automatically within about a minute.'));
++    const viewLink = tEl('a', 'hint', 'View page ↗');
++    viewLink.href = '/testimonials.html';
++    viewLink.target = '_blank';
++    viewLink.rel = 'noopener';
++    saveBar.appendChild(viewLink);
++    container.appendChild(saveBar);
++    const okEl = tEl('p', 'success');
++    const errEl = tEl('p', 'error');
++    container.appendChild(okEl);
++    container.appendChild(errEl);
++
++    function renderList() {
++      list.innerHTML = '';
++      if (!reviews.length) {
++        list.appendChild(tEl('p', 'ta-empty', 'No reviews yet. Click “+ Add review” to add the first one.'));
++        return;
++      }
++      reviews.forEach((r, i) => list.appendChild(buildItem(r, i)));
++    }
++
++    function buildItem(r, i) {
++      const item = tEl('div', 'group ta-item');
++      const head = tEl('div', 'ta-head');
++      const title = tEl('div', 'ta-title');
++      const nameEl = tEl('strong');
++      const metaEl = tEl('span', 'ta-meta');
++      title.appendChild(nameEl);
++      title.appendChild(metaEl);
++      const badges = tEl('div', 'ta-badges');
++      const controls = tEl('div', 'ta-controls');
++
++      function mk(label, cls, handler, disabled, aria) {
++        const b = tEl('button', cls, label);
++        b.type = 'button';
++        if (aria) b.setAttribute('aria-label', aria);
++        b.disabled = !!disabled;
++        b.addEventListener('click', handler);
++        return b;
++      }
++
++      function refresh() {
++        nameEl.textContent = r.name || 'New review';
++        const stars = '★'.repeat(r.rating || 5);
++        metaEl.textContent = [stars, r.relation, r.city].filter(Boolean).join(' · ');
++        badges.innerHTML = '';
++        if (parseVideoLink(r.videoUrl)) badges.appendChild(tEl('span', 'ta-badge video', 'Video'));
++        if (r.featured) badges.appendChild(tEl('span', 'ta-badge featured', 'Featured'));
++        if (r.visible === false) badges.appendChild(tEl('span', 'ta-badge hidden', 'Hidden'));
++      }
++
++      const panel = tEl('div', 'ta-panel');
++      panel.hidden = !r._open;
++      const editBtn = mk(r._open ? 'Close' : 'Edit', '', () => {
++        r._open = !r._open;
++        panel.hidden = !r._open;
++        editBtn.textContent = r._open ? 'Close' : 'Edit';
++      });
++      controls.appendChild(mk('↑', '', () => { reviews.splice(i - 1, 0, reviews.splice(i, 1)[0]); renderList(); }, i === 0, 'Move up'));
++      controls.appendChild(mk('↓', '', () => { reviews.splice(i + 1, 0, reviews.splice(i, 1)[0]); renderList(); }, i === reviews.length - 1, 'Move down'));
++      controls.appendChild(editBtn);
++      controls.appendChild(mk('Delete', 'ta-del', () => {
++        if (!window.confirm('Delete this review' + (r.name ? ' from ' + r.name : '') + '? It is removed from the site once you save.')) return;
++        reviews.splice(i, 1);
++        renderList();
++      }));
++      head.appendChild(title);
++      head.appendChild(badges);
++      head.appendChild(controls);
++      item.appendChild(head);
++
++      // ----- edit panel -----
++      function textField(label, key, opts) {
++        opts = opts || {};
++        const f = tEl('div', 'field');
++        const lab = tEl('label', null, label);
++        const input = document.createElement(opts.area ? 'textarea' : 'input');
++        if (!opts.area) input.type = opts.type || 'text';
++        input.value = r[key] || '';
++        if (opts.placeholder) input.placeholder = opts.placeholder;
++        if (opts.max) input.maxLength = opts.max;
++        input.addEventListener('input', () => { r[key] = input.value; refresh(); if (opts.onInput) opts.onInput(input.value); });
++        lab.appendChild(document.createElement('span'));
++        f.appendChild(lab);
++        f.appendChild(input);
++        if (opts.note) f.appendChild(tEl('p', 'ta-note', opts.note));
++        return { field: f, input };
++      }
++
++      const row = tEl('div', 'ta-row');
++      row.appendChild(textField('Name *', 'name', { max: 80, placeholder: 'e.g. Priya S.' }).field);
++      row.appendChild(textField('Relationship', 'relation', { max: 80, placeholder: 'e.g. Daughter of client' }).field);
++      const ratingField = tEl('div', 'field');
++      ratingField.appendChild(tEl('label', null, 'Rating'));
++      const rating = document.createElement('select');
++      [5, 4, 3, 2, 1].forEach((n) => {
++        const o = document.createElement('option');
++        o.value = String(n);
++        o.textContent = '★'.repeat(n);
++        if (Number(r.rating || 5) === n) o.selected = true;
++        rating.appendChild(o);
++      });
++      rating.addEventListener('change', () => { r.rating = Number(rating.value); refresh(); });
++      ratingField.appendChild(rating);
++      row.appendChild(ratingField);
++      panel.appendChild(row);
++
++      panel.appendChild(textField('City / area (optional)', 'city', { max: 60, placeholder: 'e.g. Mumbai' }).field);
++      panel.appendChild(textField('Review text', 'text', { area: true, max: 3000, placeholder: 'What the family said, in their own words. Leave blank for a video-only review.', note: 'Press Enter twice for a new paragraph. Use their words as-is — no need to add quotation marks.' }).field);
++
++      // video link with live check
++      const status = tEl('p', 'ta-vstatus');
++      const prev = tEl('img', 'ta-vprev');
++      prev.alt = '';
++      prev.hidden = true;
++      function checkVideo(value) {
++        const v = parseVideoLink(value);
++        prev.hidden = true;
++        if (!String(value || '').trim()) { status.textContent = ''; status.className = 'ta-vstatus'; return; }
++        if (!v) { status.textContent = '⚠ This isn’t a YouTube or Vimeo link.'; status.className = 'ta-vstatus bad'; return; }
++        status.className = 'ta-vstatus ok';
++        status.textContent = '✓ ' + v.provider + ' video recognised' + (v.vertical ? ' (vertical / Short)' : '') + '.';
++        if (v.thumb) { prev.src = v.thumb; prev.hidden = false; }
++        else status.textContent += ' Vimeo doesn’t give an automatic preview image — add a thumbnail link below if you want one.';
++      }
++      const vf = textField('Video link (YouTube or Vimeo)', 'videoUrl', { max: 300, placeholder: 'https://www.youtube.com/watch?v=…', onInput: checkVideo });
++      vf.field.appendChild(status);
++      vf.field.appendChild(prev);
++      panel.appendChild(vf.field);
++      checkVideo(r.videoUrl);
++
++      panel.appendChild(textField('Custom thumbnail (optional)', 'thumbnail', { max: 300, placeholder: 'https://… or images/your-photo.jpg', note: 'Only needed for Vimeo, or to replace the automatic YouTube preview image.' }).field);
++
++      // checkboxes
++      const checks = tEl('div', 'ta-checks');
++      function check(label, key, onChange, invert) {
++        const wrap = tEl('label', 'ta-check');
++        const box = document.createElement('input');
++        box.type = 'checkbox';
++        box.checked = invert ? r[key] !== false : !!r[key];
++        box.addEventListener('change', () => { r[key] = box.checked; refresh(); if (onChange) onChange(); });
++        wrap.appendChild(box);
++        wrap.appendChild(tEl('span', null, label));
++        return wrap;
++      }
++      checks.appendChild(check('Show on the website', 'visible', null, true));
++      checks.appendChild(check('Featured — show as the big story at the top (only one at a time)', 'featured', () => {
++        if (r.featured) reviews.forEach((o) => { if (o !== r) o.featured = false; });
++        renderList();
++      }));
++      checks.appendChild(check('Vertical video (recorded on a phone / YouTube Short)', 'vertical'));
++      panel.appendChild(checks);
++
++      item.appendChild(panel);
++      refresh();
++      return item;
++    }
++
++    addBtn.addEventListener('click', () => {
++      reviews.unshift({ id: '', name: '', relation: '', city: '', rating: 5, text: '', videoUrl: '', vertical: false, thumbnail: '', featured: false, visible: true, _open: true });
++      renderList();
++    });
++
++    saveBtn.addEventListener('click', async () => {
++      okEl.classList.remove('is-visible');
++      errEl.classList.remove('is-visible');
++      for (let i = 0; i < reviews.length; i++) {
++        const r = reviews[i];
++        const label = 'Review ' + (i + 1) + (r.name ? ' (' + r.name + ')' : '');
++        let problem = '';
++        if (!String(r.name || '').trim()) problem = 'add a name.';
++        else if (!String(r.text || '').trim() && !String(r.videoUrl || '').trim()) problem = 'add review text, a video link, or both.';
++        else if (String(r.videoUrl || '').trim() && !parseVideoLink(r.videoUrl)) problem = 'the video link must be a YouTube or Vimeo link.';
++        if (problem) {
++          r._open = true;
++          renderList();
++          errEl.textContent = label + ': ' + problem;
++          errEl.classList.add('is-visible');
++          return;
++        }
++      }
++      saveBtn.disabled = true;
++      saveBtn.textContent = 'Saving…';
++      try {
++        const payload = reviews.map((r) => { const copy = Object.assign({}, r); delete copy._open; return copy; });
++        const res = await api('/api/content', { method: 'POST', body: JSON.stringify({ page: 'testimonials', data: { reviews: payload } }) });
++        okEl.textContent = res.message || 'Saved.';
++        okEl.classList.add('is-visible');
++      } catch (err) {
++        errEl.textContent = err.message;
++        errEl.classList.add('is-visible');
++      } finally {
++        saveBtn.disabled = false;
++        saveBtn.textContent = 'Save changes';
++      }
++    });
++
++    renderList();
++  }
++
+   // ---------- Invoice tool ----------
+   // Purely client-side: nothing here is sent to the server or committed to
+   // the repo. Draft is kept in this browser's localStorage so a refresh
+diff --git a/api/content.js b/api/content.js
+index 9ea8135..02b58fc 100644
+--- a/api/content.js
++++ b/api/content.js
+@@ -1,13 +1,14 @@
+ const fs = require('fs');
+ const path = require('path');
+ const { getSession } = require('../lib/auth');
+-const { commitJsonFile } = require('../lib/github');
++const { commitJsonFile, readJsonFile } = require('../lib/github');
++const { validateTestimonials } = require('../lib/testimonials');
+ 
+ // Whitelist of editable pages — prevents path traversal and keeps the admin
+ // UI's page picker in sync with what's actually wired up to data-k attributes.
+ // Add an entry here (and a matching content/<page>.json + data-k attributes
+ // in the HTML) whenever you extend editing to another page.
+-const ALLOWED_PAGES = ['index', 'services', 'plans', 'team', 'contact'];
++const ALLOWED_PAGES = ['index', 'services', 'plans', 'team', 'contact', 'testimonials'];
+ 
+ function contentPath(page) {
+   return path.join(process.cwd(), 'content', `${page}.json`);
+@@ -26,6 +27,19 @@ module.exports = async (req, res) => {
+       res.status(400).json({ error: 'Unknown page.' });
+       return;
+     }
++    // Testimonials are added/removed in whole entries, so the admin must see the
++    // newest saved version even before Vercel finishes redeploying.
++    if (page === 'testimonials') {
++      try {
++        const live = await readJsonFile('content/testimonials.json');
++        if (live) {
++          res.status(200).json({ page, data: live });
++          return;
++        }
++      } catch {
++        // GitHub unreachable or not configured — fall back to the deployed copy below.
++      }
++    }
+     const filePath = contentPath(page);
+     if (!fs.existsSync(filePath)) {
+       res.status(404).json({ error: `content/${page}.json does not exist yet.` });
+@@ -56,10 +70,22 @@ module.exports = async (req, res) => {
+       return;
+     }
+ 
++    // Testimonials are rendered into static HTML at build time, so they get
++    // validated (and cleaned) here before anything is committed.
++    let toSave = data;
++    if (page === 'testimonials') {
++      const check = validateTestimonials(data);
++      if (!check.ok) {
++        res.status(400).json({ error: check.error });
++        return;
++      }
++      toSave = check.data;
++    }
++
+     try {
+       await commitJsonFile(
+         `content/${page}.json`,
+-        data,
++        toSave,
+         `Update ${page} content via admin editor (${session.email})`
+       );
+     } catch (err) {
+diff --git a/choose-best-home-care-services-for-parents.html b/choose-best-home-care-services-for-parents.html
+index 2f94642..903d70d 100644
+--- a/choose-best-home-care-services-for-parents.html
++++ b/choose-best-home-care-services-for-parents.html
+@@ -25,6 +25,7 @@
+       <a href="index.html#top">Home</a>
+       <a href="services.html">Services</a>
+       <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="testimonials.html">Testimonials</a>
+       <!-- <a href="index.html#how-it-works">How it works</a> -->
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact</a>
+@@ -192,6 +193,7 @@
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+       <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="testimonials.html">Testimonials</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact Us</a>
+       <a href="resources.html">Blog &amp; Guides</a>
+diff --git a/consistent-care-quality-of-life-seniors.html b/consistent-care-quality-of-life-seniors.html
+index d685966..fbf5906 100644
+--- a/consistent-care-quality-of-life-seniors.html
++++ b/consistent-care-quality-of-life-seniors.html
+@@ -25,6 +25,7 @@
+       <a href="index.html#top">Home</a>
+       <a href="services.html">Services</a>
+       <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="testimonials.html">Testimonials</a>
+       <!-- <a href="index.html#how-it-works">How it works</a> -->
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact</a>
+@@ -183,6 +184,7 @@
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+       <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="testimonials.html">Testimonials</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact Us</a>
+       <a href="resources.html">Blog &amp; Guides</a>
+diff --git a/contact.html b/contact.html
+index e4acd73..aa0243a 100644
+--- a/contact.html
++++ b/contact.html
+@@ -26,6 +26,7 @@
+       <a href="index.html#top">Home</a>
+       <a href="services.html">Services</a>
+       <a href="plans.html">Plans &amp; Prices</a>
++      <a href="testimonials.html">Testimonials</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html" class="is-active">Contact</a>
+     </nav>
+@@ -211,6 +212,7 @@
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+       <a href="plans.html">Plans &amp; Prices</a>
++      <a href="testimonials.html">Testimonials</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact Us</a>
+       <a href="index.html#resources">Blog &amp; Guides</a>
+diff --git a/content/testimonials.json b/content/testimonials.json
+new file mode 100644
+index 0000000..92d8900
+--- /dev/null
++++ b/content/testimonials.json
+@@ -0,0 +1,17 @@
++{
++  "reviews": [
++    {
++      "id": "sandeep-kamath",
++      "name": "Sandeep Kamath",
++      "relation": "Client",
++      "city": "",
++      "rating": 5,
++      "text": "I have been using Sidhi Elder Care Services for over four months now, and I cannot recommend them highly enough.\nThey have supported my family through hospital admissions, doctor visits, and follow-up care, including managing prescribed medications for both my mother and my sister. For all of the above, I would rate them very highly.\nWhat stands out most is their reliability and punctuality. They arrange pick-up for elder care patients by Uber, and they are consistently on time, organized, and caring. It has given our entire family complete peace of mind knowing our loved ones are in safe, capable hands.\nIf you are looking for trustworthy elder care support, Sidhi is exceptional. Highly recommended",
++      "videoUrl": "",
++      "vertical": false,
++      "thumbnail": "",
++      "featured": true,
++      "visible": true
++    }
++  ]
++}
+diff --git a/home-health-care-independent-living.html b/home-health-care-independent-living.html
+index e7a054a..c858a82 100644
+--- a/home-health-care-independent-living.html
++++ b/home-health-care-independent-living.html
+@@ -25,6 +25,7 @@
+       <a href="index.html#top">Home</a>
+       <a href="services.html">Services</a>
+       <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="testimonials.html">Testimonials</a>
+       <!-- <a href="index.html#how-it-works">How it works</a> -->
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact</a>
+@@ -185,6 +186,7 @@
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+       <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="testimonials.html">Testimonials</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact Us</a>
+       <a href="resources.html">Blog &amp; Guides</a>
+diff --git a/index.html b/index.html
+index 5d5c9d4..8c62d4c 100644
+--- a/index.html
++++ b/index.html
+@@ -24,6 +24,7 @@
+       <a href="#top">Home</a>
+       <a href="services.html">Services</a>
+       <a href="plans.html">Plans &amp; Prices</a>
++      <a href="testimonials.html">Testimonials</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact</a>
+     </nav>
+@@ -597,6 +598,7 @@
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+       <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="testimonials.html">Testimonials</a>
+       <a href="team.html">Our Team</a>
+       <a href="#contact">FAQ</a>
+       <a href="resources.html">Blog &amp; Guides</a>
+diff --git a/lib/github.js b/lib/github.js
+index 2ec7684..17bbfdf 100644
+--- a/lib/github.js
++++ b/lib/github.js
+@@ -65,4 +65,22 @@ async function commitJsonFile(filePath, jsonValue, commitMessage) {
+   });
+ }
+ 
+-module.exports = { commitJsonFile };
++/**
++ * Read a JSON file as it is on the branch right now (not the deployed copy,
++ * which lags a minute behind after a save). Returns null if it doesn't exist.
++ */
++async function readJsonFile(filePath) {
++  const owner = requireEnv('GITHUB_OWNER');
++  const repo = requireEnv('GITHUB_REPO');
++  const branch = process.env.GITHUB_BRANCH || 'main';
++  const encodedPath = filePath.split('/').map(encodeURIComponent).join('/');
++  try {
++    const file = await githubRequest(`/repos/${owner}/${repo}/contents/${encodedPath}?ref=${branch}`);
++    return JSON.parse(Buffer.from(file.content, 'base64').toString('utf8'));
++  } catch (err) {
++    if (/ 404 /.test(err.message)) return null;
++    throw err;
++  }
++}
++
++module.exports = { commitJsonFile, readJsonFile };
+diff --git a/lib/testimonials.js b/lib/testimonials.js
+new file mode 100644
+index 0000000..90d07ac
+--- /dev/null
++++ b/lib/testimonials.js
+@@ -0,0 +1,321 @@
++// Shared by the admin API (validation) and the build step (rendering).
++// content/testimonials.json  ->  static HTML inside testimonials.html
++//
++// Everything that reaches the page is escaped here, and videos are only ever
++// embedded from a fixed allow-list of hosts (YouTube / Vimeo), so an admin
++// can't inject markup or arbitrary iframes through this file.
++
++const MAX_REVIEWS = 100;
++
++// ---------- helpers ----------
++function esc(value) {
++  return String(value == null ? '' : value)
++    .replace(/&/g, '&amp;')
++    .replace(/</g, '&lt;')
++    .replace(/>/g, '&gt;')
++    .replace(/"/g, '&quot;')
++    .replace(/'/g, '&#39;');
++}
++
++function cleanStr(value, max) {
++  return typeof value === 'string' ? value.replace(/\r\n/g, '\n').trim().slice(0, max) : '';
++}
++
++function slugify(text) {
++  return String(text || '')
++    .toLowerCase()
++    .replace(/[^a-z0-9]+/g, '-')
++    .replace(/^-+|-+$/g, '')
++    .slice(0, 40);
++}
++
++// ---------- video links ----------
++/**
++ * Accepts a YouTube or Vimeo link in any common shape and returns
++ * { provider, id, vertical, embed, thumb } — or null if it isn't one.
++ */
++function parseVideo(input) {
++  if (typeof input !== 'string') return null;
++  const raw = input.trim();
++  if (!raw || raw.length > 300) return null;
++
++  let u;
++  try {
++    u = new URL(/^https?:\/\//i.test(raw) ? raw : `https://${raw}`);
++  } catch {
++    return null;
++  }
++  if (u.protocol !== 'https:' && u.protocol !== 'http:') return null;
++
++  const host = u.hostname.toLowerCase().replace(/^(www|m)\./, '');
++  const seg = u.pathname.split('/').filter(Boolean);
++  const YT_ID = /^[A-Za-z0-9_-]{11}$/;
++
++  // ----- YouTube -----
++  let ytId = null;
++  let vertical = false;
++  if (host === 'youtu.be') {
++    ytId = seg[0];
++  } else if (host === 'youtube.com' || host === 'youtube-nocookie.com') {
++    if (seg[0] === 'watch') ytId = u.searchParams.get('v');
++    else if (['shorts', 'embed', 'live', 'v'].includes(seg[0])) ytId = seg[1];
++    if (seg[0] === 'shorts') vertical = true;
++  }
++  if (ytId && YT_ID.test(ytId)) {
++    return {
++      provider: 'youtube',
++      id: ytId,
++      vertical,
++      embed: `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&playsinline=1&modestbranding=1`,
++      thumb: `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`,
++    };
++  }
++
++  // ----- Vimeo -----
++  let vmId = null;
++  let vmHash = null;
++  if (host === 'vimeo.com') {
++    vmId = seg[0];
++    if (seg[1] && /^[a-f0-9]{6,}$/i.test(seg[1])) vmHash = seg[1]; // unlisted links
++  } else if (host === 'player.vimeo.com' && seg[0] === 'video') {
++    vmId = seg[1];
++    vmHash = u.searchParams.get('h');
++  }
++  if (vmId && /^\d{5,12}$/.test(vmId)) {
++    const hashPart = vmHash && /^[a-f0-9]{6,}$/i.test(vmHash) ? `h=${vmHash}&` : '';
++    return {
++      provider: 'vimeo',
++      id: vmId,
++      vertical: false,
++      embed: `https://player.vimeo.com/video/${vmId}?${hashPart}autoplay=1`,
++      thumb: '', // Vimeo has no static thumbnail URL — admin can set a custom one
++    };
++  }
++
++  return null;
++}
++
++// ---------- validation / normalisation ----------
++function normalizeReview(r, index, usedIds) {
++  const errors = [];
++  const label = `Review ${index + 1}`;
++  const src = r && typeof r === 'object' ? r : {};
++
++  const name = cleanStr(src.name, 80);
++  const text = cleanStr(src.text, 3000);
++  const videoUrl = cleanStr(src.videoUrl, 300);
++  const thumbnail = cleanStr(src.thumbnail, 300);
++
++  if (!name) errors.push(`${label}: name is required.`);
++  if (!text && !videoUrl) errors.push(`${label}: add review text, a video link, or both.`);
++  if (videoUrl && !parseVideo(videoUrl)) {
++    errors.push(`${label}: the video link must be a YouTube or Vimeo link.`);
++  }
++  if (thumbnail && !/^https:\/\/\S+$/i.test(thumbnail) && !/^images\/[\w./-]+$/.test(thumbnail)) {
++    errors.push(`${label}: thumbnail must be an https:// link or a file under images/.`);
++  }
++
++  let rating = Math.round(Number(src.rating));
++  if (!Number.isFinite(rating)) rating = 5;
++  rating = Math.min(5, Math.max(1, rating));
++
++  let id = cleanStr(src.id, 60);
++  if (!/^[a-z0-9-]{1,60}$/.test(id) || usedIds.has(id)) {
++    const base = slugify(name) || 'review';
++    id = base;
++    let n = 2;
++    while (usedIds.has(id)) id = `${base}-${n++}`;
++  }
++  usedIds.add(id);
++
++  return {
++    errors,
++    review: {
++      id,
++      name,
++      relation: cleanStr(src.relation, 80),
++      city: cleanStr(src.city, 60),
++      rating,
++      text,
++      videoUrl,
++      vertical: !!src.vertical,
++      thumbnail,
++      featured: !!src.featured,
++      visible: src.visible !== false,
++    },
++  };
++}
++
++/** Returns { ok: true, data } with cleaned data, or { ok: false, error }. */
++function validateTestimonials(data) {
++  if (!data || typeof data !== 'object' || !Array.isArray(data.reviews)) {
++    return { ok: false, error: 'Testimonials must be an object with a "reviews" list.' };
++  }
++  if (data.reviews.length > MAX_REVIEWS) {
++    return { ok: false, error: `Too many reviews (max ${MAX_REVIEWS}).` };
++  }
++
++  const usedIds = new Set();
++  const errors = [];
++  const reviews = data.reviews.map((r, i) => {
++    const out = normalizeReview(r, i, usedIds);
++    errors.push(...out.errors);
++    return out.review;
++  });
++  if (errors.length) return { ok: false, error: errors.join(' ') };
++
++  // Only one spotlight review — keep the first one marked featured.
++  let seenFeatured = false;
++  reviews.forEach((r) => {
++    if (r.featured && seenFeatured) r.featured = false;
++    if (r.featured) seenFeatured = true;
++  });
++
++  return { ok: true, data: { reviews } };
++}
++
++// ---------- rendering ----------
++const STAR_ICON = '★';
++
++function starsHtml(rating) {
++  const full = STAR_ICON.repeat(rating) + '☆'.repeat(5 - rating);
++  return `<div class="testimonial-stars" role="img" aria-label="${rating} out of 5 stars">${full}</div>`;
++}
++
++function paragraphs(text) {
++  return text
++    .split(/\n+/)
++    .map((p) => p.trim())
++    .filter(Boolean)
++    .map((p) => `<p>${esc(p)}</p>`)
++    .join('');
++}
++
++function personHtml(r) {
++  const initial = esc((r.name.trim().charAt(0) || '?').toUpperCase());
++  const meta = [r.relation, r.city].filter(Boolean).join(' · ');
++  return `<div class="testimonial-person">
++          <span class="testimonial-avatar" aria-hidden="true">${initial}</span>
++          <div>
++            <p class="testimonial-name">${esc(r.name)}</p>${meta ? `
++            <p class="testimonial-role">${esc(meta)}</p>` : ''}
++          </div>
++        </div>`;
++}
++
++const PLAY_ICON =
++  '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z"/></svg>';
++
++function videoThumbHtml(r, video, cls = '') {
++  const vertical = r.vertical || video.vertical;
++  const thumb = r.thumbnail || video.thumb;
++  const img = thumb
++    ? `<img src="${esc(thumb)}" alt="" loading="lazy" decoding="async">`
++    : '<span class="t-thumb-fallback" aria-hidden="true"></span>';
++  const title = `Video testimonial from ${r.name}`;
++  return `<button type="button" class="t-video-thumb js-play-video${vertical ? ' is-vertical' : ''}${cls ? ` ${cls}` : ''}" data-embed="${esc(video.embed)}" data-vertical="${vertical ? '1' : '0'}" data-title="${esc(title)}" aria-label="Play ${esc(title)}">
++          ${img}
++          <span class="t-play">${PLAY_ICON}</span>
++          <span class="t-video-label">Watch ${esc(r.name.split(' ')[0])}'s story</span>
++        </button>`;
++}
++
++function cardHtml(r) {
++  const video = r.videoUrl ? parseVideo(r.videoUrl) : null;
++  const long = r.text.length > 260;
++  const qid = `q-${r.id}`;
++  const type = video ? 'video' : 'text';
++
++  return `      <article class="t-card${video ? ' t-card-video' : ''}" data-type="${type}">
++        ${video ? videoThumbHtml(r, video) : ''}
++        <div class="t-card-body">
++          <div class="t-card-top">${starsHtml(r.rating)}</div>${r.text ? `
++          <blockquote class="t-quote" id="${esc(qid)}"${long ? ' data-long="1"' : ''}>${paragraphs(r.text)}</blockquote>${long ? `
++          <button type="button" class="t-more" aria-expanded="false" aria-controls="${esc(qid)}" hidden>Read more</button>` : ''}` : ''}
++        </div>
++        ${personHtml(r)}
++      </article>`;
++}
++
++function spotlightHtml(r) {
++  const video = r.videoUrl ? parseVideo(r.videoUrl) : null;
++  const long = r.text.length > 700;
++  return `    <section class="t-spot-section" aria-label="Featured testimonial">
++      <div class="wrap">
++        <article class="t-spot${video ? ' has-video' : ''}">
++          ${video ? videoThumbHtml(r, video, 't-spot-thumb') : ''}
++          <div class="t-spot-body">
++            <span class="t-spot-badge">Featured story</span>
++            ${starsHtml(r.rating)}${r.text ? `
++            <blockquote class="t-spot-quote${long ? ' is-long' : ''}">${paragraphs(r.text)}</blockquote>` : ''}
++            ${personHtml(r)}
++          </div>
++        </article>
++      </div>
++    </section>`;
++}
++
++function statsHtml(visible) {
++  // Only show numbers once there are enough reviews for them to mean something.
++  if (visible.length < 3) return '';
++  const avg = visible.reduce((s, r) => s + r.rating, 0) / visible.length;
++  const videos = visible.filter((r) => r.videoUrl && parseVideo(r.videoUrl)).length;
++  return `    <section class="t-stats" aria-label="Review summary">
++      <div class="wrap t-stats-inner">
++        <p><strong>${avg.toFixed(1)}</strong><span>${STAR_ICON} average rating</span></p>
++        <p><strong>${visible.length}</strong><span>family reviews</span></p>${videos ? `
++        <p><strong>${videos}</strong><span>video stories</span></p>` : ''}
++      </div>
++    </section>
++`;
++}
++
++/** Builds everything between the TESTIMONIALS markers in testimonials.html. */
++function renderTestimonials(data) {
++  const check = validateTestimonials(data);
++  const reviews = check.ok ? check.data.reviews : [];
++  const visible = reviews.filter((r) => r.visible);
++
++  if (!visible.length) {
++    return `    <section class="t-empty"><div class="wrap"><h2>Stories are on their way</h2><p>We're collecting words from the families we support. Check back soon — or reach out and we'll happily introduce you to one.</p></div></section>`;
++  }
++
++  const spot = visible.find((r) => r.featured) || visible[0];
++  const rest = visible.filter((r) => r !== spot);
++  const hasVideo = rest.some((r) => r.videoUrl && parseVideo(r.videoUrl));
++  const hasText = rest.some((r) => !(r.videoUrl && parseVideo(r.videoUrl)));
++  const videoCount = rest.filter((r) => r.videoUrl && parseVideo(r.videoUrl)).length;
++
++  const filters =
++    hasVideo && hasText
++      ? `      <div class="t-filters" role="group" aria-label="Filter stories">
++        <button type="button" class="t-chip is-active" data-filter="all" aria-pressed="true">All <span>${rest.length}</span></button>
++        <button type="button" class="t-chip" data-filter="video" aria-pressed="false">Video stories <span>${videoCount}</span></button>
++        <button type="button" class="t-chip" data-filter="text" aria-pressed="false">Written reviews <span>${rest.length - videoCount}</span></button>
++      </div>
++`
++      : '';
++
++  const grid = rest.length
++    ? `    <section class="t-grid-section" id="stories" aria-label="More stories">
++      <div class="wrap">
++        <div class="t-head">
++          <h2>More Words From <em>Our Families</em></h2>
++        </div>
++${filters}        <div class="t-grid">
++${rest.map(cardHtml).join('\n')}
++        </div>
++      </div>
++    </section>`
++    : '';
++
++  return `${statsHtml(visible)}${spotlightHtml(spot)}
++${grid}`;
++}
++
++module.exports = {
++  parseVideo,
++  validateTestimonials,
++  renderTestimonials,
++  esc,
++};
+diff --git a/plans.html b/plans.html
+index 4f35997..32338d3 100644
+--- a/plans.html
++++ b/plans.html
+@@ -27,6 +27,7 @@
+       <a href="index.html#top">Home</a>
+       <a href="services.html">Services</a>
+       <a href="plans.html" class="is-active">Plans &amp; Prices</a>
++      <a href="testimonials.html">Testimonials</a>
+       <!-- <a href="index.html#how-it-works">How it works</a> -->
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact</a>
+@@ -501,6 +502,7 @@ If you are looking for trustworthy elder care support, Sidhi is exceptional. Hig
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+       <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="testimonials.html">Testimonials</a>
+       <a href="team.html">Our Team</a>
+       <a href="#faq">FAQ</a>
+       <a href="index.html#resources">Blog &amp; Guides</a>
+diff --git a/privacy.html b/privacy.html
+index df263d9..c53a962 100644
+--- a/privacy.html
++++ b/privacy.html
+@@ -26,6 +26,7 @@
+       <a href="index.html#top">Home</a>
+       <a href="services.html">Services</a>
+       <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="testimonials.html">Testimonials</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact</a>
+     </nav>
+@@ -187,6 +188,7 @@
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+       <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="testimonials.html">Testimonials</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact Us</a>
+       <a href="resources.html">Blog &amp; Guides</a>
+diff --git a/refund.html b/refund.html
+index 573bad6..1777476 100644
+--- a/refund.html
++++ b/refund.html
+@@ -26,6 +26,7 @@
+       <a href="index.html#top">Home</a>
+       <a href="services.html">Services</a>
+       <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="testimonials.html">Testimonials</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact</a>
+     </nav>
+@@ -136,6 +137,7 @@
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+       <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="testimonials.html">Testimonials</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact Us</a>
+       <a href="resources.html">Blog &amp; Guides</a>
+diff --git a/resources.html b/resources.html
+index 0896438..a4dfed9 100644
+--- a/resources.html
++++ b/resources.html
+@@ -25,6 +25,7 @@
+       <a href="index.html#top">Home</a>
+       <a href="services.html">Services</a>
+       <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="testimonials.html">Testimonials</a>
+       <!-- <a href="index.html#how-it-works">How it works</a> -->
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact</a>
+@@ -128,6 +129,7 @@
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+       <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="testimonials.html">Testimonials</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact Us</a>
+       <a href="resources.html">Blog &amp; Guides</a>
+diff --git a/scripts/inject-content.js b/scripts/inject-content.js
+index 3356f85..7f752a0 100644
+--- a/scripts/inject-content.js
++++ b/scripts/inject-content.js
+@@ -10,6 +10,7 @@
+ const fs = require('fs');
+ const path = require('path');
+ const cheerio = require('cheerio');
++const { renderTestimonials } = require('../lib/testimonials');
+ 
+ const ROOT = path.join(__dirname, '..');
+ const PAGES = ['index', 'services', 'plans', 'team', 'contact'];
+@@ -60,3 +61,38 @@ function injectPage(page) {
+ for (const page of PAGES) {
+   injectPage(page);
+ }
++
++// ---------------------------------------------------------------------------
++// testimonials.html — the review cards are generated from
++// content/testimonials.json and written between two marker comments, so the
++// page is still plain static HTML (readable by Google, no runtime fetch).
++// Plain string replacement is used here (not cheerio) so nothing else in the
++// file is touched and the step is safe to run repeatedly.
++// ---------------------------------------------------------------------------
++function renderTestimonialsPage() {
++  const htmlPath = path.join(ROOT, 'testimonials.html');
++  const jsonPath = path.join(ROOT, 'content', 'testimonials.json');
++  if (!fs.existsSync(htmlPath) || !fs.existsSync(jsonPath)) {
++    console.log('[inject-content] skip testimonials: missing testimonials.html or content/testimonials.json');
++    return;
++  }
++
++  const START = '<!-- TESTIMONIALS:START -->';
++  const END = '<!-- TESTIMONIALS:END -->';
++  const html = fs.readFileSync(htmlPath, 'utf8');
++  const a = html.indexOf(START);
++  const b = html.indexOf(END);
++  if (a === -1 || b === -1 || b < a) {
++    console.warn('[inject-content] testimonials.html: marker comments not found — nothing rendered');
++    return;
++  }
++
++  const data = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
++  const body = renderTestimonials(data);
++  const next = html.slice(0, a + START.length) + '\n' + body + '\n    ' + html.slice(b);
++  if (next !== html) fs.writeFileSync(htmlPath, next);
++  const count = Array.isArray(data.reviews) ? data.reviews.length : 0;
++  console.log(`[inject-content] testimonials.html: rendered ${count} review(s)`);
++}
++
++renderTestimonialsPage();
+diff --git a/services.html b/services.html
+index 7588000..0699315 100644
+--- a/services.html
++++ b/services.html
+@@ -24,6 +24,7 @@
+       <a href="index.html#top">Home</a>
+       <a href="services.html" class="is-active">Services</a>
+       <a href="plans.html">Plans &amp; Prices</a>
++      <a href="testimonials.html">Testimonials</a>
+       <!-- <a href="index.html#how-it-works">How it works</a> -->
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact</a>
+@@ -345,6 +346,7 @@
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+       <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="testimonials.html">Testimonials</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact Us</a>
+       <a href="index.html#resources">Blog &amp; Guides</a>
+diff --git a/style.css b/style.css
+index 2ef34ae..4f69400 100644
+--- a/style.css
++++ b/style.css
+@@ -205,7 +205,8 @@ img{ max-width: 100%; display: block; }
+ 
+ @media (min-width: 961px) and (max-width: 1120px){
+   .header-inner{ gap: 24px; }
+-  .site-nav{ gap: 18px; }
++  /* right-align instead of centring so six links never collide with the logo */
++  .site-nav{ gap: 18px; left: auto; right: 24px; transform: translateY(-50%); }
+   .site-nav a{ font-size: 0.88rem; }
+ }
+ 
+diff --git a/team.html b/team.html
+index a3def00..489a213 100644
+--- a/team.html
++++ b/team.html
+@@ -26,6 +26,7 @@
+       <a href="index.html#top">Home</a>
+       <a href="services.html">Services</a>
+       <a href="plans.html">Plans &amp; Prices</a>
++      <a href="testimonials.html">Testimonials</a>
+       <a href="team.html" class="is-active">Our Team</a>
+       <a href="contact.html">Contact</a>
+     </nav>
+@@ -275,6 +276,7 @@
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+       <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="testimonials.html">Testimonials</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact Us</a>
+       <a href="index.html#resources">Blog &amp; Guides</a>
+diff --git a/terms.html b/terms.html
+index a75a510..a6e0dac 100644
+--- a/terms.html
++++ b/terms.html
+@@ -26,6 +26,7 @@
+       <a href="index.html#top">Home</a>
+       <a href="services.html">Services</a>
+       <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="testimonials.html">Testimonials</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact</a>
+     </nav>
+@@ -161,6 +162,7 @@
+     <nav class="footer-col" aria-label="Company">
+       <p class="footer-col-title">Company</p>
+       <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="testimonials.html">Testimonials</a>
+       <a href="team.html">Our Team</a>
+       <a href="contact.html">Contact Us</a>
+       <a href="resources.html">Blog &amp; Guides</a>
+diff --git a/testimonials.css b/testimonials.css
+new file mode 100644
+index 0000000..4df8071
+--- /dev/null
++++ b/testimonials.css
+@@ -0,0 +1,308 @@
++/* ============================================
++   Testimonials page
++   Uses the shared tokens from style.css only.
++   Reuses: .page-hero, .section-badge, .btn, .cta*,
++   .testimonial-stars/-avatar/-person/-name/-role
++   ============================================ */
++
++/* ---------- Stats strip (only rendered with 3+ reviews) ---------- */
++.t-stats{ padding: 40px 0 0; }
++.t-stats-inner{
++  display: flex; flex-wrap: wrap; justify-content: center;
++  gap: 16px 56px;
++}
++.t-stats-inner p{ margin: 0; display: flex; align-items: baseline; gap: 10px; }
++.t-stats-inner strong{
++  font-family: var(--font-display);
++  font-size: 2rem; font-weight: 700; color: var(--pine-dark);
++}
++.t-stats-inner span{ font-size: 0.9rem; font-weight: 600; color: var(--ink-soft); }
++
++/* ---------- Spotlight ---------- */
++.t-spot-section{ padding: 64px 0 56px; }
++.t-spot{
++  position: relative;
++  background: #fff;
++  border: 1px solid var(--line);
++  border-radius: 22px;
++  box-shadow: var(--shadow-soft);
++  padding: 48px 56px 40px;
++  max-width: 880px;
++  margin: 0 auto;
++  overflow: hidden;
++}
++.t-spot::before{
++  content: "\201C";
++  position: absolute;
++  top: -14px; right: 36px;
++  font-family: var(--font-display);
++  font-size: 9rem; line-height: 1;
++  color: var(--marigold);
++  opacity: 0.85;
++  pointer-events: none;
++}
++.t-spot.has-video{
++  max-width: var(--wrap);
++  display: grid;
++  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
++  gap: 44px;
++  align-items: center;
++  padding: 36px;
++}
++.t-spot.has-video::before{ display: none; }
++.t-spot-body{ position: relative; }
++.t-spot-badge{
++  display: inline-block;
++  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
++  color: var(--pine-dark);
++  background: var(--marigold);
++  padding: 5px 14px; border-radius: 999px;
++  margin: 0 0 16px;
++}
++.t-spot .testimonial-stars{ font-size: 1.05rem; margin-bottom: 18px; }
++.t-spot-quote{
++  margin: 0 0 28px;
++  font-family: var(--font-display);
++  font-weight: 500;
++  font-size: clamp(1.1rem, 1.9vw, 1.4rem);
++  line-height: 1.55;
++  color: var(--pine-dark);
++}
++.t-spot-quote p{ color: inherit; margin: 0 0 0.8em; }
++.t-spot-quote p:last-child{ margin-bottom: 0; }
++.t-spot-quote.is-long{ font-size: clamp(1.02rem, 1.5vw, 1.18rem); line-height: 1.65; }
++.t-spot .testimonial-person{
++  padding-top: 22px;
++  border-top: 1px solid var(--line);
++}
++
++/* ---------- Video thumbnail (shared by spotlight + cards) ---------- */
++.t-video-thumb{
++  position: relative;
++  display: block;
++  width: 100%;
++  aspect-ratio: 16 / 10;
++  border: 0; padding: 0;
++  border-radius: 14px;
++  overflow: hidden;
++  cursor: pointer;
++  color: var(--cream);
++  background: var(--pine-dark);
++}
++.t-video-thumb img,
++.t-thumb-fallback{
++  position: absolute; inset: 0;
++  width: 100%; height: 100%;
++  object-fit: cover;
++  transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
++}
++.t-thumb-fallback{
++  background:
++    radial-gradient(circle at 25% 20%, rgba(79,168,216,0.5), transparent 55%),
++    linear-gradient(200deg, var(--pine-tint) 0%, var(--pine-dark) 100%);
++}
++.t-video-thumb::after{
++  content: "";
++  position: absolute; inset: 0;
++  background: linear-gradient(180deg, rgba(20,73,95,0) 45%, rgba(20,73,95,0.72) 100%);
++}
++.t-video-thumb:hover img,
++.t-video-thumb:hover .t-thumb-fallback{ transform: scale(1.05); }
++.t-video-thumb.is-vertical{ aspect-ratio: 9 / 14; max-height: 520px; }
++.t-video-thumb.is-vertical img{ transform: scale(1.12); }
++.t-video-thumb.is-vertical:hover img{ transform: scale(1.16); }
++.t-play{
++  position: absolute;
++  top: 50%; left: 50%;
++  z-index: 2;
++  width: 68px; height: 68px;
++  margin: -34px 0 0 -34px;
++  border-radius: 50%;
++  display: flex; align-items: center; justify-content: center;
++  background: var(--marigold);
++  color: var(--pine-dark);
++  box-shadow: 0 10px 30px -8px rgba(0,0,0,0.5);
++  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.2s ease;
++}
++.t-play svg{ margin-left: 3px; width: 26px; height: 26px; }
++.t-video-thumb:hover .t-play{ transform: scale(1.1); background: var(--marigold-dark); }
++.t-video-label{
++  position: absolute;
++  left: 16px; bottom: 14px;
++  z-index: 2;
++  font-size: 0.82rem; font-weight: 700;
++  color: var(--cream);
++  text-shadow: 0 1px 8px rgba(0,0,0,0.4);
++}
++
++/* ---------- Grid of cards ---------- */
++.t-grid-section{ padding: 72px 0 72px; }
++.t-spot-section + .t-grid-section{ padding-top: 16px; }
++.t-head{ text-align: center; }
++.t-head h2{ max-width: none; margin: 0 0 0.6em; }
++
++.t-filters{
++  display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
++  margin: 0 0 36px;
++}
++.t-chip{
++  font-family: var(--font-body);
++  font-size: 0.86rem; font-weight: 600;
++  color: var(--pine-dark);
++  background: #fff;
++  border: 1.5px solid var(--line);
++  border-radius: 999px;
++  padding: 9px 18px;
++  cursor: pointer;
++  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
++}
++.t-chip span{
++  display: inline-block; margin-left: 6px;
++  font-size: 0.74rem; font-weight: 700;
++  background: var(--sand); color: var(--pine-dark);
++  padding: 1px 8px; border-radius: 999px;
++}
++.t-chip:hover{ border-color: var(--pine); }
++.t-chip.is-active{ background: var(--pine-dark); border-color: var(--pine-dark); color: var(--cream); }
++.t-chip.is-active span{ background: rgba(251,247,239,0.18); color: var(--cream); }
++
++.t-grid{
++  display: grid;
++  grid-template-columns: repeat(3, minmax(0, 1fr));
++  gap: 24px;
++  align-items: stretch;
++}
++.t-card{
++  display: flex; flex-direction: column;
++  min-width: 0;
++  background: #fff;
++  border: 1px solid var(--line);
++  border-radius: var(--radius-lg);
++  padding: 26px 24px 22px;
++  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.25s ease;
++}
++.t-card:hover{
++  transform: translateY(-4px);
++  border-color: rgba(46,134,171,0.3);
++  box-shadow: 0 16px 36px -14px rgba(20,73,95,0.18);
++}
++.t-card[hidden]{ display: none; }
++.t-card-video{ padding: 14px 14px 22px; }
++.t-card-video .t-card-body,
++.t-card-video .testimonial-person{ padding-left: 10px; padding-right: 10px; }
++.t-card-video .t-video-thumb{ margin-bottom: 18px; }
++.t-card-body{ display: flex; flex-direction: column; flex: 1; }
++.t-card-top{ margin-bottom: 12px; }
++.t-card .testimonial-stars{ margin: 0; font-size: 0.95rem; }
++.t-quote{
++  margin: 0 0 16px;
++  font-size: 0.93rem;
++  line-height: 1.6;
++  color: var(--ink);
++}
++.t-quote p{ color: inherit; margin: 0 0 0.8em; }
++.t-quote p:last-child{ margin-bottom: 0; }
++.t-quote.is-clamped{
++  display: -webkit-box;
++  -webkit-line-clamp: 7;
++  -webkit-box-orient: vertical;
++  overflow: hidden;
++}
++.t-more{
++  align-self: flex-start;
++  font-family: var(--font-body);
++  font-size: 0.84rem; font-weight: 700;
++  color: var(--clayrose);
++  background: none; border: 0; padding: 0;
++  margin: -6px 0 16px;
++  cursor: pointer;
++}
++.t-more:hover{ text-decoration: underline; }
++.t-card .testimonial-person{
++  margin-top: auto;
++  padding-top: 16px;
++  border-top: 1px solid var(--line);
++}
++
++.t-empty{ padding: 88px 0; text-align: center; }
++.t-empty h2{ max-width: none; }
++.t-empty p{ max-width: 52ch; margin: 0 auto; }
++
++/* ---------- Share your experience ---------- */
++.t-share{ padding: 0; }
++.t-spot-section + .t-share{ margin-top: -8px; }
++.t-share-card{
++  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
++  gap: 32px 48px;
++  background: var(--sand);
++  border-radius: var(--radius-lg);
++  padding: 44px 48px;
++}
++.t-share-copy{ flex: 1 1 360px; max-width: 560px; }
++.t-share-copy h2{ max-width: none; margin-bottom: 0.4em; }
++.t-share-copy p:last-child{ margin-bottom: 0; }
++.t-share-actions{ display: flex; flex-wrap: wrap; gap: 14px; }
++.t-share-actions .btn svg{ transition: none; }
++.t-share-actions .btn:hover svg{ transform: none; }
++
++/* ---------- Video pop-up ---------- */
++.vm{
++  position: fixed; inset: 0; z-index: 400;
++  background: rgba(20,24,28,0.82);
++  backdrop-filter: blur(4px);
++  display: flex; align-items: center; justify-content: center;
++  padding: 24px;
++}
++.vm[hidden]{ display: none; }
++.vm-inner{ position: relative; width: 100%; display: flex; justify-content: center; }
++.vm-frame{
++  position: relative;
++  width: min(960px, 100%);
++  aspect-ratio: 16 / 9;
++  background: #000;
++  border-radius: 14px;
++  overflow: hidden;
++  box-shadow: 0 30px 80px -20px rgba(0,0,0,0.7);
++}
++.vm-frame.is-vertical{
++  width: auto;
++  height: min(84vh, 760px);
++  aspect-ratio: 9 / 16;
++  max-width: 100%;
++}
++.vm-frame iframe{ position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
++.vm-close{
++  position: absolute;
++  top: -48px; right: 0;
++  width: 40px; height: 40px;
++  border-radius: 50%;
++  border: 0;
++  display: flex; align-items: center; justify-content: center;
++  background: var(--cream); color: var(--pine-dark);
++  cursor: pointer;
++  transition: background 0.15s ease, transform 0.15s ease;
++}
++.vm-close:hover{ background: var(--marigold); transform: scale(1.06); }
++
++/* ---------- Responsive ---------- */
++@media (max-width: 1020px){
++  .t-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
++  .t-spot.has-video{ grid-template-columns: 1fr; gap: 28px; }
++}
++@media (max-width: 700px){
++  .t-spot-section{ padding: 44px 0 16px; }
++  .t-spot{ padding: 40px 24px 28px; }
++  .t-spot.has-video{ padding: 18px 18px 26px; }
++  .t-spot::before{ font-size: 6rem; right: 18px; top: -8px; }
++  .t-grid-section{ padding: 52px 0 52px; }
++  .t-grid{ grid-template-columns: 1fr; }
++  .t-share-card{ padding: 32px 22px; }
++  .t-share-actions{ width: 100%; flex-direction: column; }
++  .t-share-actions .btn{ justify-content: center; white-space: normal; }
++  .t-stats-inner{ gap: 10px 32px; }
++  .vm{ padding: 16px; }
++  .vm-close{ top: -46px; }
++}
++@media (prefers-reduced-motion: reduce){
++  .t-video-thumb img, .t-thumb-fallback, .t-play, .t-card{ transition: none !important; }
++}
+diff --git a/testimonials.html b/testimonials.html
+new file mode 100644
+index 0000000..1efbdaf
+--- /dev/null
++++ b/testimonials.html
+@@ -0,0 +1,259 @@
++<!DOCTYPE html>
++<html lang="en">
++<head>
++<meta charset="UTF-8">
++<meta name="viewport" content="width=device-width, initial-scale=1.0">
++<title>Client Testimonials — SIDDHI ElderCare Services</title>
++<link rel="icon" type="image/png" href="logo-mark.png">
++<meta name="description" content="Hear from the families we support — written reviews and video stories from people who trust SIDDHI ElderCare Services with their parents' care in Mumbai and Virar.">
++<link rel="preconnect" href="https://fonts.googleapis.com">
++<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
++<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
++<link rel="stylesheet" href="style.css">
++<link rel="stylesheet" href="testimonials.css">
++</head>
++<body>
++
++<a class="skip-link" href="#main">Skip to content</a>
++
++<header class="site-header" id="siteHeader">
++  <div class="wrap header-inner">
++    <a class="logo" href="index.html#top">
++      <img class="logo-mark" src="logo-mark.png" alt="" aria-hidden="true">
++      <span class="logo-text">SIDDHI<span class="logo-sub">ElderCare Services</span></span>
++    </a>
++
++    <nav class="site-nav" id="siteNav" aria-label="Primary">
++      <a href="index.html#top">Home</a>
++      <a href="services.html">Services</a>
++      <a href="plans.html">Plans &amp; Prices</a>
++      <a href="testimonials.html" class="is-active">Testimonials</a>
++      <!-- <a href="index.html#how-it-works">How it works</a> -->
++      <a href="team.html">Our Team</a>
++      <a href="contact.html">Contact</a>
++    </nav>
++
++    <button type="button" class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="siteNav">
++      <span class="nav-toggle-bar"></span>
++      <span class="nav-toggle-bar"></span>
++      <span class="nav-toggle-bar"></span>
++    </button>
++  </div>
++</header>
++
++<main id="main">
++
++  <!-- PAGE HERO -->
++  <section class="page-hero" id="top">
++    <div class="wrap page-hero-inner">
++      <p class="hero-badge">
++        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12c-2-2-3.5-3.2-3.5-4.8a2.3 2.3 0 0 1 4.2-1.4 2.3 2.3 0 0 1 4.2 1.4c0 1.6-1.5 2.8-3.5 4.8L12 13.2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11c1.2 2 3.5 3 6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 11c-1.2 2-3.5 3-6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5c0 2.5 3.5 4.5 9 4.5s9-2 9-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
++        Testimonials
++      </p>
++      <h1>Real Families. <em>Real Stories.</em></h1>
++      <p class="hero-lede">Hear it from the people who know us best — the families who trust SIDDHI with their parents' care, in their own words and in their own voices.</p>
++    </div>
++  </section>
++
++  <!--
++    Everything between the two markers below is generated at build time from
++    content/testimonials.json (edit it from /admin → Tools → Testimonials).
++    Don't edit by hand — it is overwritten on every build.
++  -->
++  <!-- TESTIMONIALS:START -->
++    <section class="t-spot-section" aria-label="Featured testimonial">
++      <div class="wrap">
++        <article class="t-spot">
++          
++          <div class="t-spot-body">
++            <span class="t-spot-badge">Featured story</span>
++            <div class="testimonial-stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
++            <blockquote class="t-spot-quote is-long"><p>I have been using Sidhi Elder Care Services for over four months now, and I cannot recommend them highly enough.</p><p>They have supported my family through hospital admissions, doctor visits, and follow-up care, including managing prescribed medications for both my mother and my sister. For all of the above, I would rate them very highly.</p><p>What stands out most is their reliability and punctuality. They arrange pick-up for elder care patients by Uber, and they are consistently on time, organized, and caring. It has given our entire family complete peace of mind knowing our loved ones are in safe, capable hands.</p><p>If you are looking for trustworthy elder care support, Sidhi is exceptional. Highly recommended</p></blockquote>
++            <div class="testimonial-person">
++          <span class="testimonial-avatar" aria-hidden="true">S</span>
++          <div>
++            <p class="testimonial-name">Sandeep Kamath</p>
++            <p class="testimonial-role">Client</p>
++          </div>
++        </div>
++          </div>
++        </article>
++      </div>
++    </section>
++
++    <!-- TESTIMONIALS:END -->
++
++  <!-- SHARE YOUR EXPERIENCE -->
++  <section class="t-share" id="share">
++    <div class="wrap">
++      <div class="t-share-card">
++        <div class="t-share-copy">
++          <p class="section-badge">
++            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12c-2-2-3.5-3.2-3.5-4.8a2.3 2.3 0 0 1 4.2-1.4 2.3 2.3 0 0 1 4.2 1.4c0 1.6-1.5 2.8-3.5 4.8L12 13.2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11c1.2 2 3.5 3 6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 11c-1.2 2-3.5 3-6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5c0 2.5 3.5 4.5 9 4.5s9-2 9-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
++            Your Turn
++          </p>
++          <h2>Been Cared For By <em>SIDDHI?</em></h2>
++          <p>We'd love to hear how it's gone for your family. Send us a few lines — or a short video — and, with your permission, we'll share it here to help other families decide.</p>
++        </div>
++        <div class="t-share-actions">
++          <a class="btn btn-primary btn-large" href="https://wa.me/917710031734?text=Hi%21%20I%27d%20like%20to%20share%20my%20experience%20with%20SIDDHI%20ElderCare%20Services." target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16.02 3C9.4 3 4 8.38 4 15c0 2.32.66 4.49 1.8 6.33L4 29l7.86-1.75A11.9 11.9 0 0 0 16.02 27C22.64 27 28 21.62 28 15S22.64 3 16.02 3Zm0 21.6c-1.98 0-3.83-.55-5.42-1.5l-.39-.23-4.66 1.04 1.02-4.55-.25-.4A9.52 9.52 0 0 1 6.4 15c0-5.3 4.32-9.6 9.62-9.6 5.3 0 9.6 4.3 9.6 9.6 0 5.3-4.3 9.6-9.6 9.6Zm5.29-7.19c-.29-.14-1.71-.84-1.98-.94-.27-.1-.46-.14-.66.14-.2.29-.76.94-.93 1.13-.17.2-.34.22-.63.07-.29-.14-1.22-.45-2.33-1.44-.86-.77-1.44-1.71-1.61-2-.17-.29-.02-.44.13-.58.13-.13.29-.34.43-.51.14-.17.19-.29.29-.48.1-.2.05-.36-.02-.5-.07-.14-.66-1.6-.91-2.19-.24-.58-.48-.5-.66-.5-.17-.01-.36-.01-.56-.01-.2 0-.51.07-.78.36-.27.29-1.02 1-1.02 2.44 0 1.44 1.05 2.83 1.19 3.03.14.2 2.06 3.15 5 4.42.7.3 1.24.48 1.67.61.7.22 1.34.19 1.84.12.56-.08 1.71-.7 1.96-1.38.24-.67.24-1.25.17-1.38-.07-.13-.26-.2-.55-.34Z"/></svg> Share On WhatsApp</a>
++          <a class="btn btn-ghost btn-large" href="mailto:support@siddhieldercare.com?subject=My%20experience%20with%20SIDDHI%20ElderCare&body=Hi%20SIDDHI%20team%2C%0A%0AI%27d%20like%20to%20share%20my%20experience%3A%0A%0A"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Send An Email</a>
++        </div>
++      </div>
++    </div>
++  </section>
++
++  <!-- CTA -->
++  <section class="cta" id="contact-plan">
++    <div class="wrap">
++      <div class="cta-media">
++        <p class="cta-badge">
++          <span class="live-pulse" aria-hidden="true"></span>
++          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12c-2-2-3.5-3.2-3.5-4.8a2.3 2.3 0 0 1 4.2-1.4 2.3 2.3 0 0 1 4.2 1.4c0 1.6-1.5 2.8-3.5 4.8L12 13.2z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11c1.2 2 3.5 3 6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 11c-1.2 2-3.5 3-6 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15.5c0 2.5 3.5 4.5 9 4.5s9-2 9-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
++          Join The Families We Support
++        </p>
++        <h2 class="cta-heading">Talk To A Care Advisor — <em>No Pressure, No Cost</em></h2>
++        <p class="cta-lede">Tell us about your parents and a coordinator will call you back, usually within a few hours.</p>
++        <div class="cta-actions">
++          <button type="button" class="btn btn-primary btn-large js-open-consult">Start With A Free Conversation
++            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
++          </button>
++          <a class="hero-phone-link cta-phone-link" href="tel:+917710031734">
++            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.4 0 .8-.3 1l-2.2 2.2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
++            Call 7710 031 734
++          </a>
++          <a class="hero-phone-link cta-phone-link" href="tel:+919136648667">
++            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.4 0 .8-.3 1l-2.2 2.2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
++            Call 9136 648 667
++          </a>
++        </div>
++      </div>
++    </div>
++  </section>
++
++</main>
++
++<footer class="site-footer">
++  <div class="wrap footer-top">
++    <div class="footer-brand">
++      <div class="footer-brand-row">
++        <img class="logo-mark footer-logo-mark" src="logo-mark.png" alt="" aria-hidden="true">
++        <span class="logo-text footer-logo">SIDDHI<span class="logo-sub">ElderCare Services</span></span>
++      </div>
++      <p class="footer-tagline">Compassionate, one-on-one non-medical home care for seniors and adults across Mumbai and Virar.</p>
++    </div>
++
++    <nav class="footer-col" aria-label="Services">
++      <p class="footer-col-title">Services</p>
++      <a href="index.html#services">Medical &amp; Nursing Support</a>
++      <a href="index.html#services">Companion Care</a>
++      <a href="index.html#services">Emergency Care Assistance</a>
++      <a href="index.html#services">Arrange Verified Caretakers and Nurses</a>
++      <a href="index.html#services">Social &amp; Recreational Support</a>
++      <a href="index.html#services">ICU Set-Up At Home</a>
++      <a href="index.html#services">Maintain Secured Medical Data</a>
++      <a href="index.html#services">Doctor For Home Visit Or Video Consultation</a>
++    </nav>
++
++    <nav class="footer-col" aria-label="Locations">
++      <p class="footer-col-title">Locations</p>
++      <a href="index.html#areas">Mumbai</a>
++      <a href="index.html#areas">Andheri</a>
++      <a href="index.html#areas">Bandra</a>
++      <a href="index.html#areas">Powai</a>
++      <a href="index.html#areas">Virar</a>
++    </nav>
++
++    <nav class="footer-col" aria-label="Company">
++      <p class="footer-col-title">Company</p>
++      <!-- <a href="plans.html">Plans &amp; Prices</a> -->
++      <a href="testimonials.html">Testimonials</a>
++      <a href="team.html">Our Team</a>
++      <a href="#faq">FAQ</a>
++      <a href="index.html#resources">Blog &amp; Guides</a>
++      <a href="contact.html">Contact Us</a>
++    </nav>
++  </div>
++
++  <div class="footer-bottom">
++    <div class="wrap footer-bottom-inner">
++      <p>© <span id="year"></span> SIDDHI ElderCare Services, LLC. All rights reserved.</p>
++      <p>Mumbai, Maharashtra</p>
++      <p class="footer-legal"><a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms</a> · <a href="refund.html">Refund Policy</a></p>
++    </div>
++  </div>
++</footer>
++
++<!-- FREE CONSULTATION MODAL -->
++<div class="modal-overlay" id="consultModal" role="dialog" aria-modal="true" aria-labelledby="consultModalTitle">
++  <div class="modal-card">
++    <div class="modal-card-top"></div>
++    <button type="button" class="modal-close" aria-label="Close">
++      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
++    </button>
++
++    <div class="modal-body">
++      <form class="modal-form" action="https://formsubmit.co/ajax/support@siddhieldercare.com" method="POST">
++        <h2 id="consultModalTitle">Get Your Free Consultation</h2>
++        <p class="modal-lede">Tell us a little about your parents' care needs — a coordinator will call you back, usually within a few hours.</p>
++
++        <input type="hidden" name="_subject" value="New Free Consultation Request — SIDDHI ElderCare">
++        <input type="hidden" name="_template" value="table">
++        <input type="hidden" name="_captcha" value="false">
++
++        <div class="form-row">
++          <label for="consultName">Name*</label>
++          <input type="text" id="consultName" name="Name" placeholder="Please enter your name" required>
++        </div>
++
++        <div class="form-row">
++          <label for="consultEmail">Your Email*</label>
++          <input type="email" id="consultEmail" name="Email" placeholder="To share details" required>
++        </div>
++
++        <div class="form-row">
++          <label for="consultPhone">Your Phone Number*</label>
++          <div class="phone-input-group">
++            <span class="phone-prefix">+91</span>
++            <input type="tel" id="consultPhone" name="Phone" placeholder="98765 43210" required>
++          </div>
++        </div>
++
++        <div class="form-row">
++          <label for="consultCity">Parent's City*</label>
++          <input type="text" id="consultCity" name="Parent's City" placeholder="Where is care required?" required>
++        </div>
++
++        <div class="consent-row">
++          <input type="checkbox" id="consultConsent" name="Consent" value="Yes" required>
++          <label for="consultConsent">By submitting this form, you agree to receive calls from SIDDHI ElderCare Services regarding our services.</label>
++        </div>
++
++        <button type="submit" class="btn btn-primary btn-large">Submit
++          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
++        </button>
++      </form>
++
++      <div class="modal-success">
++        <svg width="46" height="46" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.5 10.5 15 16 9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
++        <h3>Thank You!</h3>
++        <p>A care coordinator will call you back shortly.</p>
++      </div>
++    </div>
++  </div>
++</div>
++
++<!-- VIDEO TESTIMONIAL POP-UP -->
++<div class="vm" id="videoModal" role="dialog" aria-modal="true" aria-label="Video testimonial" hidden>
++  <div class="vm-inner">
++    <button type="button" class="vm-close" aria-label="Close video">
++      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
++    </button>
++    <div class="vm-frame" id="videoFrame"></div>
++  </div>
++</div>
++
++<script src="script.js"></script>
++<script src="testimonials.js"></script>
++</body>
++</html>
+diff --git a/testimonials.js b/testimonials.js
+new file mode 100644
+index 0000000..22881fc
+--- /dev/null
++++ b/testimonials.js
+@@ -0,0 +1,83 @@
++// Testimonials page behaviour: filter chips, "Read more" toggles, video pop-up.
++// The cards themselves are plain static HTML generated at build time, so with
++// JavaScript off the page still shows every review in full.
++(function () {
++  // ---------- Filter chips ----------
++  const chips = document.querySelectorAll('.t-chip');
++  const cards = document.querySelectorAll('.t-grid .t-card');
++  chips.forEach((chip) => {
++    chip.addEventListener('click', () => {
++      const filter = chip.dataset.filter;
++      chips.forEach((c) => {
++        const on = c === chip;
++        c.classList.toggle('is-active', on);
++        c.setAttribute('aria-pressed', String(on));
++      });
++      cards.forEach((card) => {
++        card.hidden = filter !== 'all' && card.dataset.type !== filter;
++      });
++    });
++  });
++
++  // ---------- Read more (long written reviews are clamped only when JS runs) ----------
++  document.querySelectorAll('.t-quote[data-long]').forEach((quote) => {
++    const btn = document.querySelector(`.t-more[aria-controls="${quote.id}"]`);
++    if (!btn) return;
++    quote.classList.add('is-clamped');
++    btn.hidden = false;
++    btn.addEventListener('click', () => {
++      const open = quote.classList.toggle('is-clamped') === false;
++      btn.textContent = open ? 'Show less' : 'Read more';
++      btn.setAttribute('aria-expanded', String(open));
++    });
++  });
++
++  // ---------- Video pop-up ----------
++  const modal = document.getElementById('videoModal');
++  const frame = document.getElementById('videoFrame');
++  if (!modal || !frame) return;
++  const closeBtn = modal.querySelector('.vm-close');
++  let lastTrigger = null;
++
++  // Only ever embed from these hosts, whatever ends up in the HTML.
++  const ALLOWED = /^https:\/\/(www\.youtube-nocookie\.com\/embed\/|player\.vimeo\.com\/video\/)/;
++
++  function openVideo(trigger) {
++    const src = trigger.dataset.embed || '';
++    if (!ALLOWED.test(src)) return;
++    lastTrigger = trigger;
++
++    frame.className = 'vm-frame' + (trigger.dataset.vertical === '1' ? ' is-vertical' : '');
++    frame.innerHTML = '';
++    const iframe = document.createElement('iframe');
++    iframe.src = src;
++    iframe.title = trigger.dataset.title || 'Video testimonial';
++    iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
++    iframe.setAttribute('allowfullscreen', '');
++    iframe.referrerPolicy = 'strict-origin-when-cross-origin';
++    frame.appendChild(iframe);
++
++    modal.hidden = false;
++    document.body.classList.add('modal-open');
++    closeBtn.focus();
++  }
++
++  function closeVideo() {
++    if (modal.hidden) return;
++    modal.hidden = true;
++    frame.innerHTML = ''; // removing the iframe stops playback
++    document.body.classList.remove('modal-open');
++    if (lastTrigger) lastTrigger.focus();
++  }
++
++  document.querySelectorAll('.js-play-video').forEach((btn) => {
++    btn.addEventListener('click', () => openVideo(btn));
++  });
++  closeBtn.addEventListener('click', closeVideo);
++  modal.addEventListener('click', (e) => {
++    if (e.target === modal || e.target.classList.contains('vm-inner')) closeVideo();
++  });
++  document.addEventListener('keydown', (e) => {
++    if (e.key === 'Escape') closeVideo();
++  });
++})();
+-- 
+2.43.0
+

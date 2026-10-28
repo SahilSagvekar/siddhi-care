@@ -118,6 +118,30 @@ Extending coverage is mechanical, not a new architecture.
 The admin form itself needs **no changes** for any of this — it renders
 inputs generically from whatever shape `content/<page>.json` has.
 
+## Testimonials (reviews and videos)
+
+The Testimonials page is managed from **/admin → Testimonials**. Add, edit,
+reorder (↑↓), hide, feature or delete reviews, then click **Save changes**.
+Saving commits `content/testimonials.json` to GitHub and Vercel redeploys
+(about a minute). The build (`scripts/inject-content.js`) renders the reviews
+into `testimonials.html` between the `<!-- TESTIMONIALS:START -->` and
+`<!-- TESTIMONIALS:END -->` markers, so the page is plain static HTML.
+
+Each review: `id, name, relation, city, rating (1-5), text, videoUrl,
+vertical, thumbnail, featured, visible`. A review needs a name plus text, a
+video, or both. Only one review can be **featured** (shown large at the top).
+
+**Videos are links, not uploads.** Upload the video to YouTube (set it to
+*Unlisted*) or Vimeo and paste the link. Supported: `youtu.be/…`,
+`youtube.com/watch?v=…`, `/shorts/…`, `/embed/…`, `vimeo.com/<id>`. Anything
+else is rejected on save. YouTube gets an automatic preview image; Vimeo needs
+a custom thumbnail URL (optional). Videos play in a pop-up using
+youtube-nocookie / Vimeo players only.
+
+Notes: the stats strip appears only once there are 3+ visible reviews, and
+filter chips only when both video and text reviews exist. All text is escaped
+on render and validated again on the server (`lib/testimonials.js`).
+
 ## Known cosmetic side effect
 
 The build script parses and re-serializes each HTML file, which normalizes

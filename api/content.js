@@ -1,13 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 const { getSession } = require('../lib/auth');
-const { commitJsonFile } = require('../lib/github');
+const { commitJsonFile, readJsonFile } = require('../lib/github');
+const { validateTestimonials } = require('../lib/testimonials');
 
 // Whitelist of editable pages — prevents path traversal and keeps the admin
 // UI's page picker in sync with what's actually wired up to data-k attributes.
 // Add an entry here (and a matching content/<page>.json + data-k attributes
 // in the HTML) whenever you extend editing to another page.
-const ALLOWED_PAGES = ['index', 'services', 'plans', 'team', 'contact'];
+const ALLOWED_PAGES = ['index', 'services', 'plans', 'team', 'contact', 'testimonials'];
 
 function contentPath(page) {
   return path.join(process.cwd(), 'content', `${page}.json`);
@@ -25,6 +26,19 @@ module.exports = async (req, res) => {
     if (!ALLOWED_PAGES.includes(page)) {
       res.status(400).json({ error: 'Unknown page.' });
       return;
+    }
+    // Testimonials are added/removed in whole entries, so the admin must see the
+    // newest saved version even before Vercel finishes redeploying.
+    if (page === 'testimonials') {
+      try {
+        const live = await readJsonFile('content/testimonials.json');
+        if (live) {
+          res.status(200).json({ page, data: live });
+          return;
+        }
+      } catch {
+        // GitHub unreachable or not configured — fall back to the deployed copy below.
+      }
     }
     const filePath = contentPath(page);
     if (!fs.existsSync(filePath)) {
@@ -56,10 +70,22 @@ module.exports = async (req, res) => {
       return;
     }
 
+    // Testimonials are rendered into static HTML at build time, so they get
+    // validated (and cleaned) here before anything is committed.
+    let toSave = data;
+    if (page === 'testimonials') {
+      const check = validateTestimonials(data);
+      if (!check.ok) {
+        res.status(400).json({ error: check.error });
+        return;
+      }
+      toSave = check.data;
+    }
+
     try {
       await commitJsonFile(
         `content/${page}.json`,
-        data,
+        toSave,
         `Update ${page} content via admin editor (${session.email})`
       );
     } catch (err) {

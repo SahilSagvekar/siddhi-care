@@ -205,7 +205,8 @@ img{ max-width: 100%; display: block; }
 
 @media (min-width: 961px) and (max-width: 1120px){
   .header-inner{ gap: 24px; }
-  .site-nav{ gap: 18px; }
+  /* right-align instead of centring so six links never collide with the logo */
+  .site-nav{ gap: 18px; left: auto; right: 24px; transform: translateY(-50%); }
   .site-nav a{ font-size: 0.88rem; }
 }
 

@@ -66,6 +66,47 @@
   .hint{ font-size:0.78rem; color:var(--ink-soft); }
   #loading{ color:var(--ink-soft); font-size:0.9rem; }
 
+
+  /* Testimonials manager */
+  .ta-top{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:6px; }
+  .ta-top h2{ margin:0; font-size:1.15rem; }
+  .ta-top .btn{ width:auto; }
+  .ta-help{ background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; margin:0 0 18px; font-size:0.84rem; color:var(--ink-soft); }
+  .ta-help strong{ color:var(--ink); }
+  .ta-help ol{ margin:6px 0 0; padding-left:18px; }
+  .ta-item{ padding:0 !important; overflow:hidden; }
+  .ta-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; flex-wrap:wrap; }
+  .ta-title{ display:flex; flex-direction:column; min-width:0; flex:1 1 220px; }
+  .ta-title strong{ font-size:0.95rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .ta-meta{ font-size:0.78rem; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .ta-badges{ display:flex; gap:6px; flex-wrap:wrap; }
+  .ta-badge{ font-size:0.66rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; padding:3px 9px; border-radius:999px; background:var(--sand); color:var(--pine-dark); }
+  .ta-badge.video{ background:#dbeaf3; }
+  .ta-badge.featured{ background:var(--marigold); }
+  .ta-badge.hidden{ background:#f2dcda; color:var(--clayrose); }
+  .ta-controls{ display:flex; gap:6px; }
+  .ta-controls button{ background:#fff; border:1.5px solid var(--line); border-radius:8px; padding:6px 10px; font-size:0.8rem; font-weight:600; color:var(--ink-soft); }
+  .ta-controls button:hover:not(:disabled){ border-color:var(--pine); color:var(--pine-dark); }
+  .ta-controls button:disabled{ opacity:0.35; cursor:default; }
+  .ta-controls .ta-del:hover{ border-color:var(--clayrose); color:var(--clayrose); }
+  .ta-panel{ padding:4px 18px 8px; border-top:1px solid var(--line); background:var(--cream); }
+  .ta-panel[hidden]{ display:none; }
+  .ta-panel .field{ margin-top:14px; }
+  .ta-row{ display:grid; grid-template-columns:1fr 1fr 110px; gap:12px; }
+  .ta-row .field{ min-width:0; }
+  .field select{ font-family:inherit; font-size:0.92rem; padding:10px 12px; border:1.5px solid var(--line); border-radius:8px; background:#fff; color:var(--ink); }
+  .ta-panel textarea{ min-height:120px; }
+  .ta-note{ font-size:0.76rem; color:var(--ink-soft); margin:0; }
+  .ta-vstatus{ font-size:0.8rem; margin:2px 0 0; }
+  .ta-vstatus.ok{ color:var(--pine); }
+  .ta-vstatus.bad{ color:var(--clayrose); }
+  .ta-vprev{ width:160px; border-radius:10px; margin-top:8px; display:block; }
+  .ta-checks{ display:flex; flex-direction:column; gap:8px; margin:16px 0 12px; }
+  .ta-check{ display:flex; align-items:flex-start; gap:10px; font-size:0.86rem; cursor:pointer; }
+  .ta-check input{ margin-top:3px; accent-color:var(--pine); }
+  .ta-empty{ text-align:center; color:var(--ink-soft); padding:30px 10px; font-size:0.9rem; }
+  @media (max-width:620px){ .ta-row{ grid-template-columns:1fr; } }
+
   /* Invoice tool */
   .invoice-toolbar{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
   .invoice-toolbar .btn{ width:auto; }
@@ -285,6 +326,14 @@
       btn.addEventListener('click', () => loadPage(page, btn));
       picker.appendChild(btn);
     });
+    const testimonialsBtn = document.createElement('button');
+    testimonialsBtn.textContent = 'Testimonials';
+    testimonialsBtn.addEventListener('click', () => {
+      document.querySelectorAll('.page-picker button').forEach((b) => b.classList.remove('is-active'));
+      testimonialsBtn.classList.add('is-active');
+      renderTestimonialsUI(document.getElementById('editorArea'));
+    });
+    picker.appendChild(testimonialsBtn);
 
     const tools = document.getElementById('toolsPicker');
     const toolsLabel = document.createElement('p');
@@ -460,6 +509,279 @@
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+  }
+
+  // ---------- Testimonials manager ----------
+  // Reviews (written and/or video) live in content/testimonials.json and are
+  // rendered into testimonials.html at build time. Videos are YouTube/Vimeo
+  // links — nothing is uploaded here, so there is no storage to manage.
+  function parseVideoLink(input) {
+    const raw = String(input || '').trim();
+    if (!raw) return null;
+    let u;
+    try { u = new URL(/^https?:\/\//i.test(raw) ? raw : 'https://' + raw); } catch { return null; }
+    const host = u.hostname.toLowerCase().replace(/^(www|m)\./, '');
+    const seg = u.pathname.split('/').filter(Boolean);
+    let id = null;
+    let vertical = false;
+    if (host === 'youtu.be') id = seg[0];
+    else if (host === 'youtube.com' || host === 'youtube-nocookie.com') {
+      if (seg[0] === 'watch') id = u.searchParams.get('v');
+      else if (['shorts', 'embed', 'live', 'v'].includes(seg[0])) id = seg[1];
+      vertical = seg[0] === 'shorts';
+    }
+    if (id && /^[A-Za-z0-9_-]{11}$/.test(id)) {
+      return { provider: 'YouTube', thumb: 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg', vertical };
+    }
+    let vm = null;
+    if (host === 'vimeo.com') vm = seg[0];
+    else if (host === 'player.vimeo.com' && seg[0] === 'video') vm = seg[1];
+    if (vm && /^\d{5,12}$/.test(vm)) return { provider: 'Vimeo', thumb: '', vertical: false };
+    return null;
+  }
+
+  function tEl(tag, cls, text) {
+    const node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text != null) node.textContent = text;
+    return node;
+  }
+
+  async function renderTestimonialsUI(container) {
+    container.innerHTML = '<p id="loading">Loading testimonials…</p>';
+    let reviews = [];
+    try {
+      const res = await api('/api/content?page=testimonials');
+      reviews = Array.isArray(res.data && res.data.reviews) ? res.data.reviews : [];
+    } catch (err) {
+      if (!/does not exist/i.test(err.message)) {
+        container.innerHTML = '<p class="error is-visible">' + escapeHtml(err.message) + '</p>';
+        return;
+      }
+    }
+    reviews.forEach((r) => { r._open = false; });
+
+    container.innerHTML = '';
+    const top = tEl('div', 'ta-top');
+    top.appendChild(tEl('h2', null, 'Testimonials'));
+    const addBtn = tEl('button', 'btn', '+ Add review');
+    addBtn.type = 'button';
+    top.appendChild(addBtn);
+    container.appendChild(top);
+
+    const help = tEl('div', 'ta-help');
+    help.innerHTML =
+      '<strong>Adding a video testimonial:</strong>' +
+      '<ol><li>Upload the video to YouTube (set visibility to <strong>Unlisted</strong>) or Vimeo.</li>' +
+      '<li>Copy the video link and paste it into the review’s “Video link” box.</li>' +
+      '<li>Save — the page updates in about a minute. Reviews can have text, a video, or both.</li></ol>';
+    container.appendChild(help);
+
+    const list = tEl('div', 'ta-list');
+    container.appendChild(list);
+
+    const saveBar = tEl('div', 'save-bar');
+    const saveBtn = tEl('button', 'btn', 'Save changes');
+    saveBtn.type = 'button';
+    saveBar.appendChild(saveBtn);
+    saveBar.appendChild(tEl('span', 'hint', 'Saved changes go live automatically within about a minute.'));
+    const viewLink = tEl('a', 'hint', 'View page ↗');
+    viewLink.href = '/testimonials.html';
+    viewLink.target = '_blank';
+    viewLink.rel = 'noopener';
+    saveBar.appendChild(viewLink);
+    container.appendChild(saveBar);
+    const okEl = tEl('p', 'success');
+    const errEl = tEl('p', 'error');
+    container.appendChild(okEl);
+    container.appendChild(errEl);
+
+    function renderList() {
+      list.innerHTML = '';
+      if (!reviews.length) {
+        list.appendChild(tEl('p', 'ta-empty', 'No reviews yet. Click “+ Add review” to add the first one.'));
+        return;
+      }
+      reviews.forEach((r, i) => list.appendChild(buildItem(r, i)));
+    }
+
+    function buildItem(r, i) {
+      const item = tEl('div', 'group ta-item');
+      const head = tEl('div', 'ta-head');
+      const title = tEl('div', 'ta-title');
+      const nameEl = tEl('strong');
+      const metaEl = tEl('span', 'ta-meta');
+      title.appendChild(nameEl);
+      title.appendChild(metaEl);
+      const badges = tEl('div', 'ta-badges');
+      const controls = tEl('div', 'ta-controls');
+
+      function mk(label, cls, handler, disabled, aria) {
+        const b = tEl('button', cls, label);
+        b.type = 'button';
+        if (aria) b.setAttribute('aria-label', aria);
+        b.disabled = !!disabled;
+        b.addEventListener('click', handler);
+        return b;
+      }
+
+      function refresh() {
+        nameEl.textContent = r.name || 'New review';
+        const stars = '★'.repeat(r.rating || 5);
+        metaEl.textContent = [stars, r.relation, r.city].filter(Boolean).join(' · ');
+        badges.innerHTML = '';
+        if (parseVideoLink(r.videoUrl)) badges.appendChild(tEl('span', 'ta-badge video', 'Video'));
+        if (r.featured) badges.appendChild(tEl('span', 'ta-badge featured', 'Featured'));
+        if (r.visible === false) badges.appendChild(tEl('span', 'ta-badge hidden', 'Hidden'));
+      }
+
+      const panel = tEl('div', 'ta-panel');
+      panel.hidden = !r._open;
+      const editBtn = mk(r._open ? 'Close' : 'Edit', '', () => {
+        r._open = !r._open;
+        panel.hidden = !r._open;
+        editBtn.textContent = r._open ? 'Close' : 'Edit';
+      });
+      controls.appendChild(mk('↑', '', () => { reviews.splice(i - 1, 0, reviews.splice(i, 1)[0]); renderList(); }, i === 0, 'Move up'));
+      controls.appendChild(mk('↓', '', () => { reviews.splice(i + 1, 0, reviews.splice(i, 1)[0]); renderList(); }, i === reviews.length - 1, 'Move down'));
+      controls.appendChild(editBtn);
+      controls.appendChild(mk('Delete', 'ta-del', () => {
+        if (!window.confirm('Delete this review' + (r.name ? ' from ' + r.name : '') + '? It is removed from the site once you save.')) return;
+        reviews.splice(i, 1);
+        renderList();
+      }));
+      head.appendChild(title);
+      head.appendChild(badges);
+      head.appendChild(controls);
+      item.appendChild(head);
+
+      // ----- edit panel -----
+      function textField(label, key, opts) {
+        opts = opts || {};
+        const f = tEl('div', 'field');
+        const lab = tEl('label', null, label);
+        const input = document.createElement(opts.area ? 'textarea' : 'input');
+        if (!opts.area) input.type = opts.type || 'text';
+        input.value = r[key] || '';
+        if (opts.placeholder) input.placeholder = opts.placeholder;
+        if (opts.max) input.maxLength = opts.max;
+        input.addEventListener('input', () => { r[key] = input.value; refresh(); if (opts.onInput) opts.onInput(input.value); });
+        lab.appendChild(document.createElement('span'));
+        f.appendChild(lab);
+        f.appendChild(input);
+        if (opts.note) f.appendChild(tEl('p', 'ta-note', opts.note));
+        return { field: f, input };
+      }
+
+      const row = tEl('div', 'ta-row');
+      row.appendChild(textField('Name *', 'name', { max: 80, placeholder: 'e.g. Priya S.' }).field);
+      row.appendChild(textField('Relationship', 'relation', { max: 80, placeholder: 'e.g. Daughter of client' }).field);
+      const ratingField = tEl('div', 'field');
+      ratingField.appendChild(tEl('label', null, 'Rating'));
+      const rating = document.createElement('select');
+      [5, 4, 3, 2, 1].forEach((n) => {
+        const o = document.createElement('option');
+        o.value = String(n);
+        o.textContent = '★'.repeat(n);
+        if (Number(r.rating || 5) === n) o.selected = true;
+        rating.appendChild(o);
+      });
+      rating.addEventListener('change', () => { r.rating = Number(rating.value); refresh(); });
+      ratingField.appendChild(rating);
+      row.appendChild(ratingField);
+      panel.appendChild(row);
+
+      panel.appendChild(textField('City / area (optional)', 'city', { max: 60, placeholder: 'e.g. Mumbai' }).field);
+      panel.appendChild(textField('Review text', 'text', { area: true, max: 3000, placeholder: 'What the family said, in their own words. Leave blank for a video-only review.', note: 'Press Enter twice for a new paragraph. Use their words as-is — no need to add quotation marks.' }).field);
+
+      // video link with live check
+      const status = tEl('p', 'ta-vstatus');
+      const prev = tEl('img', 'ta-vprev');
+      prev.alt = '';
+      prev.hidden = true;
+      function checkVideo(value) {
+        const v = parseVideoLink(value);
+        prev.hidden = true;
+        if (!String(value || '').trim()) { status.textContent = ''; status.className = 'ta-vstatus'; return; }
+        if (!v) { status.textContent = '⚠ This isn’t a YouTube or Vimeo link.'; status.className = 'ta-vstatus bad'; return; }
+        status.className = 'ta-vstatus ok';
+        status.textContent = '✓ ' + v.provider + ' video recognised' + (v.vertical ? ' (vertical / Short)' : '') + '.';
+        if (v.thumb) { prev.src = v.thumb; prev.hidden = false; }
+        else status.textContent += ' Vimeo doesn’t give an automatic preview image — add a thumbnail link below if you want one.';
+      }
+      const vf = textField('Video link (YouTube or Vimeo)', 'videoUrl', { max: 300, placeholder: 'https://www.youtube.com/watch?v=…', onInput: checkVideo });
+      vf.field.appendChild(status);
+      vf.field.appendChild(prev);
+      panel.appendChild(vf.field);
+      checkVideo(r.videoUrl);
+
+      panel.appendChild(textField('Custom thumbnail (optional)', 'thumbnail', { max: 300, placeholder: 'https://… or images/your-photo.jpg', note: 'Only needed for Vimeo, or to replace the automatic YouTube preview image.' }).field);
+
+      // checkboxes
+      const checks = tEl('div', 'ta-checks');
+      function check(label, key, onChange, invert) {
+        const wrap = tEl('label', 'ta-check');
+        const box = document.createElement('input');
+        box.type = 'checkbox';
+        box.checked = invert ? r[key] !== false : !!r[key];
+        box.addEventListener('change', () => { r[key] = box.checked; refresh(); if (onChange) onChange(); });
+        wrap.appendChild(box);
+        wrap.appendChild(tEl('span', null, label));
+        return wrap;
+      }
+      checks.appendChild(check('Show on the website', 'visible', null, true));
+      checks.appendChild(check('Featured — show as the big story at the top (only one at a time)', 'featured', () => {
+        if (r.featured) reviews.forEach((o) => { if (o !== r) o.featured = false; });
+        renderList();
+      }));
+      checks.appendChild(check('Vertical video (recorded on a phone / YouTube Short)', 'vertical'));
+      panel.appendChild(checks);
+
+      item.appendChild(panel);
+      refresh();
+      return item;
+    }
+
+    addBtn.addEventListener('click', () => {
+      reviews.unshift({ id: '', name: '', relation: '', city: '', rating: 5, text: '', videoUrl: '', vertical: false, thumbnail: '', featured: false, visible: true, _open: true });
+      renderList();
+    });
+
+    saveBtn.addEventListener('click', async () => {
+      okEl.classList.remove('is-visible');
+      errEl.classList.remove('is-visible');
+      for (let i = 0; i < reviews.length; i++) {
+        const r = reviews[i];
+        const label = 'Review ' + (i + 1) + (r.name ? ' (' + r.name + ')' : '');
+        let problem = '';
+        if (!String(r.name || '').trim()) problem = 'add a name.';
+        else if (!String(r.text || '').trim() && !String(r.videoUrl || '').trim()) problem = 'add review text, a video link, or both.';
+        else if (String(r.videoUrl || '').trim() && !parseVideoLink(r.videoUrl)) problem = 'the video link must be a YouTube or Vimeo link.';
+        if (problem) {
+          r._open = true;
+          renderList();
+          errEl.textContent = label + ': ' + problem;
+          errEl.classList.add('is-visible');
+          return;
+        }
+      }
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving…';
+      try {
+        const payload = reviews.map((r) => { const copy = Object.assign({}, r); delete copy._open; return copy; });
+        const res = await api('/api/content', { method: 'POST', body: JSON.stringify({ page: 'testimonials', data: { reviews: payload } }) });
+        okEl.textContent = res.message || 'Saved.';
+        okEl.classList.add('is-visible');
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.classList.add('is-visible');
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save changes';
+      }
+    });
+
+    renderList();
   }
 
   // ---------- Invoice tool ----------
